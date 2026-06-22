@@ -51,7 +51,7 @@
     .score-card .value{font-size:24px;font-weight:800;color:var(--primary)}
     .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
     .small{font-size:12px;color:var(--muted)}
-    .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:12px}
+    .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
     .preview-card{border:1px solid var(--border);border-radius:10px;padding:8px;background:#fafcff}
     .preview-card img{width:100%;height:110px;object-fit:cover;border-radius:8px}
     .preview-card .cap{font-size:11px;color:var(--muted);margin-top:6px;word-break:break-word}
@@ -59,6 +59,7 @@
     .row-actions{display:flex;gap:12px;flex-wrap:wrap}
     .row-actions button{max-width:260px}
     .search-input{margin-top:8px}
+    .photo-slot{border:1px solid var(--border);padding:12px;border-radius:12px;background:#fbfdff}
     @media (max-width:640px){
       .question-top{flex-direction:column}
     }
@@ -97,7 +98,7 @@
         <div class="topbar">
           <div>
             <h2>Start New Audit</h2>
-            <div class="small">Latitude / Longitude capture is mandatory before submit</div>
+            <div class="small">Click capture location before final submit</div>
           </div>
           <button style="max-width:160px;" onclick="logout()">Logout</button>
         </div>
@@ -169,18 +170,43 @@
 
       <div class="card">
         <h3>Photo Capture</h3>
-        <div class="small">Mandatory: 1 shopfront photo and minimum 1 store photo. Maximum 5 store photos allowed.</div>
+        <div class="small">Shopfront photo is mandatory. Store photos have 5 separate slots; at least 1 of them is mandatory.</div>
 
         <div class="grid" style="margin-top:12px;">
-          <div>
+          <div class="photo-slot">
             <label>Shopfront Photo (Mandatory)</label>
-            <input id="shopfrontPhoto" type="file" accept="image/*" capture="environment" onchange="handleShopfrontChange(event)">
+            <input id="shopfrontPhoto" type="file" accept="image/*" onchange="handleShopfrontChange(event)">
             <div id="shopfrontMsg" class="upload-status"></div>
           </div>
-          <div>
-            <label>Store Photos (Min 1, Max 5)</label>
-            <input id="storePhotos" type="file" accept="image/*" multiple onchange="handleStorePhotosChange(event)">
-            <div id="storePhotosMsg" class="upload-status"></div>
+
+          <div class="photo-slot">
+            <label>Store Photo 1</label>
+            <input id="storePhoto1" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 1)">
+            <div id="storePhoto1Msg" class="upload-status"></div>
+          </div>
+
+          <div class="photo-slot">
+            <label>Store Photo 2</label>
+            <input id="storePhoto2" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 2)">
+            <div id="storePhoto2Msg" class="upload-status"></div>
+          </div>
+
+          <div class="photo-slot">
+            <label>Store Photo 3</label>
+            <input id="storePhoto3" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 3)">
+            <div id="storePhoto3Msg" class="upload-status"></div>
+          </div>
+
+          <div class="photo-slot">
+            <label>Store Photo 4</label>
+            <input id="storePhoto4" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 4)">
+            <div id="storePhoto4Msg" class="upload-status"></div>
+          </div>
+
+          <div class="photo-slot">
+            <label>Store Photo 5</label>
+            <input id="storePhoto5" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 5)">
+            <div id="storePhoto5Msg" class="upload-status"></div>
           </div>
         </div>
 
@@ -225,7 +251,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbxWz_c_1bQvAOxp3WZtBnHUdcqeHy-QSEgZqtDnmY4pS6ufjaHzln3mwJiHldHNB5zrJg/exec";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbzZAM1wvun0buGXINKeJIuVbCDOd8hN5QBh1pEFzj3KxblwEIBr1B7qbiSjqx-_N9IraQ/exec";
 
     let currentUser = null;
     let mappedStores = [];
@@ -239,7 +265,13 @@
     let locationCapturedAt = "";
 
     let shopfrontFile = null;
-    let storeFiles = [];
+    let storePhotoFiles = {
+      1: null,
+      2: null,
+      3: null,
+      4: null,
+      5: null
+    };
 
     let uploadedPhotoUrls = {
       shopfrontPhotoURL: "",
@@ -445,33 +477,28 @@
 
     function handleShopfrontChange(e) {
       shopfrontFile = e.target.files[0] || null;
+      uploadedPhotoUrls.shopfrontPhotoURL = "";
       document.getElementById("shopfrontMsg").innerHTML = shopfrontFile
         ? `<span class="ok">${escapeHtml(shopfrontFile.name)}</span>`
         : `<span class="err">Shopfront photo is required.</span>`;
       renderPreviews();
     }
 
-    function handleStorePhotosChange(e) {
-      const files = Array.from(e.target.files || []);
+    function handleStorePhotoChange(e, slotNo) {
+      const file = e.target.files[0] || null;
+      storePhotoFiles[slotNo] = file;
+      uploadedPhotoUrls[`storePhoto${slotNo}URL`] = "";
 
-      if (files.length > 5) {
-        storeFiles = files.slice(0, 5);
-        document.getElementById("storePhotosMsg").innerHTML =
-          `<span class="warn">Maximum 5 photos allowed. First 5 selected.</span>`;
-      } else {
-        storeFiles = files;
-        document.getElementById("storePhotosMsg").innerHTML = storeFiles.length
-          ? `<span class="ok">${storeFiles.length} store photo(s) selected.</span>`
-          : `<span class="err">At least 1 store photo is required.</span>`;
-      }
-
-      uploadedPhotoUrls.storePhoto1URL = "";
-      uploadedPhotoUrls.storePhoto2URL = "";
-      uploadedPhotoUrls.storePhoto3URL = "";
-      uploadedPhotoUrls.storePhoto4URL = "";
-      uploadedPhotoUrls.storePhoto5URL = "";
+      const msgEl = document.getElementById(`storePhoto${slotNo}Msg`);
+      msgEl.innerHTML = file
+        ? `<span class="ok">${escapeHtml(file.name)}</span>`
+        : `<span class="warn">No file selected</span>`;
 
       renderPreviews();
+    }
+
+    function hasAtLeastOneStorePhoto() {
+      return Object.values(storePhotoFiles).some(file => !!file);
     }
 
     function renderPreviews() {
@@ -488,14 +515,17 @@
         `;
       }
 
-      storeFiles.forEach((file, i) => {
-        const url = URL.createObjectURL(file);
-        grid.innerHTML += `
-          <div class="preview-card">
-            <img src="${url}" alt="Store photo ${i+1}">
-            <div class="cap">Store ${i+1}: ${escapeHtml(file.name)}</div>
-          </div>
-        `;
+      Object.keys(storePhotoFiles).forEach(slot => {
+        const file = storePhotoFiles[slot];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          grid.innerHTML += `
+            <div class="preview-card">
+              <img src="${url}" alt="Store photo ${slot}">
+              <div class="cap">Store Photo ${slot}: ${escapeHtml(file.name)}</div>
+            </div>
+          `;
+        }
       });
     }
 
@@ -679,13 +709,8 @@
         return false;
       }
 
-      if (!storeFiles.length) {
+      if (!hasAtLeastOneStorePhoto()) {
         msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
-        return false;
-      }
-
-      if (storeFiles.length > 5) {
-        msg.innerHTML = `<span class="err">Maximum 5 store photos allowed.</span>`;
         return false;
       }
 
@@ -693,23 +718,19 @@
         document.getElementById("uploadPhotosBtn").disabled = true;
         msg.innerHTML = `<span class="warn">Uploading photos, please wait...</span>`;
 
-        uploadedPhotoUrls = {
-          shopfrontPhotoURL: "",
-          storePhoto1URL: "",
-          storePhoto2URL: "",
-          storePhoto3URL: "",
-          storePhoto4URL: "",
-          storePhoto5URL: ""
-        };
-
-        uploadedPhotoUrls.shopfrontPhotoURL = await uploadSingleFile(shopfrontFile, "Shopfront");
-
-        for (let i = 0; i < storeFiles.length; i++) {
-          const url = await uploadSingleFile(storeFiles[i], `Store Photo ${i+1}`);
-          uploadedPhotoUrls[`storePhoto${i+1}URL`] = url;
+        if (shopfrontFile && !uploadedPhotoUrls.shopfrontPhotoURL) {
+          uploadedPhotoUrls.shopfrontPhotoURL = await uploadSingleFile(shopfrontFile, "Shopfront");
         }
 
-        msg.innerHTML = `<span class="ok">All photos uploaded successfully.</span>`;
+        for (let i = 1; i <= 5; i++) {
+          const file = storePhotoFiles[i];
+          const key = `storePhoto${i}URL`;
+          if (file && !uploadedPhotoUrls[key]) {
+            uploadedPhotoUrls[key] = await uploadSingleFile(file, `Store Photo ${i}`);
+          }
+        }
+
+        msg.innerHTML = `<span class="ok">Selected photos uploaded successfully.</span>`;
         return true;
       } catch (e) {
         msg.innerHTML = `<span class="err">${escapeHtml(e.message || "Photo upload failed.")}</span>`;
@@ -738,13 +759,8 @@
         return;
       }
 
-      if (!storeFiles.length) {
+      if (!hasAtLeastOneStorePhoto()) {
         msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
-        return;
-      }
-
-      if (storeFiles.length > 5) {
-        msg.innerHTML = `<span class="err">Maximum 5 store photos allowed.</span>`;
         return;
       }
 
@@ -754,14 +770,8 @@
         return;
       }
 
-      const needPhotoUpload =
-        !uploadedPhotoUrls.shopfrontPhotoURL ||
-        (storeFiles.length > 0 && !uploadedPhotoUrls.storePhoto1URL);
-
-      if (needPhotoUpload) {
-        const ok = await uploadAllPhotos();
-        if (!ok) return;
-      }
+      const ok = await uploadAllPhotos();
+      if (!ok) return;
 
       try {
         document.getElementById("submitAuditBtn").disabled = true;
@@ -815,7 +825,6 @@
         }
 
         msg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${escapeHtml(data.auditId || "")}</span>`;
-        document.getElementById("submitAuditBtn").disabled = true;
       } catch (e) {
         msg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
       } finally {
