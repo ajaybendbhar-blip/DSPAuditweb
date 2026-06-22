@@ -69,7 +69,7 @@
     <div class="topbar">
       <div>
         <h1>Daikin DSP Audit App</h1>
-        <div class="small">Region → Branch → DSP audit workflow</div>
+        <div class="small">Region → Branch → DSP → Location → Photos → Audit Submit</div>
       </div>
       <div class="pill">Default Password: Daikin@123</div>
     </div>
@@ -97,7 +97,7 @@
         <div class="topbar">
           <div>
             <h2>Start New Audit</h2>
-            <div class="small">Select Region, Branch and DSP, then capture location</div>
+            <div class="small">Latitude / Longitude capture is mandatory before submit</div>
           </div>
           <button style="max-width:160px;" onclick="logout()">Logout</button>
         </div>
@@ -146,7 +146,7 @@
           </div>
         </div>
 
-        <div style="margin-top:14px;max-width:280px;">
+        <div style="margin-top:14px;max-width:320px;">
           <button onclick="captureLocation()">Capture Latitude / Longitude</button>
         </div>
         <div id="gpsMsg" class="msg"></div>
@@ -225,7 +225,7 @@
   </div>
 
   <script>
-    const API_BASE = "YOUR_APPS_SCRIPT_WEBAPP_URL";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbxWz_c_1bQvAOxp3WZtBnHUdcqeHy-QSEgZqtDnmY4pS6ufjaHzln3mwJiHldHNB5zrJg/exec";
 
     let currentUser = null;
     let mappedStores = [];
@@ -261,6 +261,7 @@
       try {
         return JSON.parse(text);
       } catch (e) {
+        console.error("Raw API response:", text);
         return { success:false, message:"Invalid API response", raw:text };
       }
     }
@@ -435,7 +436,7 @@
           locationCapturedAt = new Date().toISOString();
           msg.innerHTML = `<span class="ok">Latitude: ${capturedLatitude}, Longitude: ${capturedLongitude}</span>`;
         },
-        err => {
+        () => {
           msg.innerHTML = `<span class="err">Unable to capture location. Please allow GPS permission and try again.</span>`;
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -452,6 +453,7 @@
 
     function handleStorePhotosChange(e) {
       const files = Array.from(e.target.files || []);
+
       if (files.length > 5) {
         storeFiles = files.slice(0, 5);
         document.getElementById("storePhotosMsg").innerHTML =
@@ -462,6 +464,13 @@
           ? `<span class="ok">${storeFiles.length} store photo(s) selected.</span>`
           : `<span class="err">At least 1 store photo is required.</span>`;
       }
+
+      uploadedPhotoUrls.storePhoto1URL = "";
+      uploadedPhotoUrls.storePhoto2URL = "";
+      uploadedPhotoUrls.storePhoto3URL = "";
+      uploadedPhotoUrls.storePhoto4URL = "";
+      uploadedPhotoUrls.storePhoto5URL = "";
+
       renderPreviews();
     }
 
@@ -530,9 +539,7 @@
 
           q.innerHTML = `
             <div class="question-top">
-              <div>
-                <strong>${escapeHtml(c.ParameterName)}</strong>
-              </div>
+              <div><strong>${escapeHtml(c.ParameterName)}</strong></div>
               <div class="marks">Weightage: ${Number(c.Weightage || 0).toFixed(2)}</div>
             </div>
             <div class="option-group">${optionsHtml}</div>
@@ -583,6 +590,7 @@
 
         const weightage = Number(q.dataset.weightage || 0);
         const points = Number(selected.value || 0);
+
         rows.push({
           CriteriaID: q.dataset.criteriaid,
           SectionName: q.dataset.sectionname,
@@ -618,9 +626,7 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
 
-            canvas.toBlob(blob => {
-              resolve(blob);
-            }, "image/jpeg", quality);
+            canvas.toBlob(blob => resolve(blob), "image/jpeg", quality);
           };
           img.src = e.target.result;
         };
@@ -633,16 +639,13 @@
     async function blobToBase64(blob) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = reader.result.split(",")[1];
-          resolve(result);
-        };
+        reader.onloadend = () => resolve(reader.result.split(",")[1]);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
     }
 
-    async function uploadSingleFile(file, label, index = null) {
+    async function uploadSingleFile(file, label) {
       const compressed = await compressImage(file);
       const base64Data = await blobToBase64(compressed);
 
@@ -659,6 +662,7 @@
       });
 
       const data = await parseResponse(res);
+
       if (!data.success) {
         throw new Error(data.message || `${label} upload failed`);
       }
@@ -701,7 +705,7 @@
         uploadedPhotoUrls.shopfrontPhotoURL = await uploadSingleFile(shopfrontFile, "Shopfront");
 
         for (let i = 0; i < storeFiles.length; i++) {
-          const url = await uploadSingleFile(storeFiles[i], `Store Photo ${i+1}`, i);
+          const url = await uploadSingleFile(storeFiles[i], `Store Photo ${i+1}`);
           uploadedPhotoUrls[`storePhoto${i+1}URL`] = url;
         }
 
@@ -725,7 +729,7 @@
       }
 
       if (!capturedLatitude || !capturedLongitude) {
-        msg.innerHTML = `<span class="err">Latitude and Longitude capture is mandatory before submit.</span>`;
+        msg.innerHTML = `<span class="err">Please click "Capture Latitude / Longitude" before submit.</span>`;
         return;
       }
 
@@ -752,7 +756,7 @@
 
       const needPhotoUpload =
         !uploadedPhotoUrls.shopfrontPhotoURL ||
-        (!uploadedPhotoUrls.storePhoto1URL && storeFiles.length > 0);
+        (storeFiles.length > 0 && !uploadedPhotoUrls.storePhoto1URL);
 
       if (needPhotoUpload) {
         const ok = await uploadAllPhotos();
