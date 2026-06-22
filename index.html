@@ -3,91 +3,125 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daikin DSP Audit App</title>
+  <title>Daikin DSP Audit</title>
   <style>
     :root{
-      --primary:#005bac;
-      --primary-dark:#01427c;
-      --bg:#f3f6fb;
+      --brand:#005BAC;
+      --brand-dark:#00427c;
+      --brand-light:#eaf4ff;
+      --bg:#f4f7fb;
       --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#dbe3ee;
-      --success:#128a45;
-      --danger:#c62828;
-      --warning:#d97706;
+      --text:#17212f;
+      --muted:#667085;
+      --line:#d7e2f0;
+      --ok:#15803d;
+      --warn:#b45309;
+      --bad:#b91c1c;
+      --radius:16px;
+      --shadow:0 10px 24px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    .container{max-width:1180px;margin:24px auto;padding:16px}
-    .card{background:var(--card);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:20px;margin-bottom:18px;border:1px solid var(--border)}
-    h1,h2,h3,h4{margin:0 0 12px}
-    h1{color:var(--primary)}
+    .app{max-width:1180px;margin:0 auto;padding:16px}
+    .hero{
+      background:linear-gradient(135deg,var(--brand) 0%, #0a78db 100%);
+      color:#fff;border-radius:20px;padding:20px;box-shadow:var(--shadow);margin:16px 0;
+    }
+    .hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .hero h1{margin:0;font-size:28px}
+    .hero p{margin:8px 0 0;color:rgba(255,255,255,.9)}
+    .badge{background:rgba(255,255,255,.14);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:18px;margin:16px 0;
+    }
+    .section-title{margin:0 0 14px;font-size:20px;color:var(--brand)}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
-    input,select,textarea,button{width:100%;padding:11px 12px;border:1px solid #cfd8e3;border-radius:10px;font:inherit}
-    textarea{min-height:80px;resize:vertical}
-    input[readonly]{background:#f7f9fc}
-    button{background:var(--primary);color:#fff;border:none;font-weight:700;cursor:pointer}
-    button:hover{background:var(--primary-dark)}
-    button[disabled]{opacity:.65;cursor:not-allowed}
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    label{display:block;font-size:13px;font-weight:700;margin:0 0 6px}
+    input,select,textarea,button{
+      width:100%;padding:12px;border:1px solid #cdd8e5;border-radius:12px;font:inherit
+    }
+    input[readonly]{background:#f7faff}
+    textarea{min-height:84px;resize:vertical}
+    button{border:none;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+    button:hover{background:var(--brand-dark)}
+    .btn-secondary{background:#eef5ff;color:var(--brand);border:1px solid #cfe1fb}
+    .btn-secondary:hover{background:#deeeff}
+    .btn-danger{background:#fff1f2;color:var(--bad);border:1px solid #fecdd3}
     .hidden{display:none}
     .msg{margin-top:10px;font-size:14px;font-weight:700}
-    .ok{color:var(--success)}
-    .err{color:var(--danger)}
-    .warn{color:var(--warning)}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#eef4ff;color:var(--primary);margin-bottom:10px}
-    .section-block{border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px}
-    .question{padding:12px 0;border-bottom:1px dashed #e4e9f0}
+    .ok{color:var(--ok)}
+    .warn{color:var(--warn)}
+    .err{color:var(--bad)}
+    .progress-wrap{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+    .progress-bar{
+      width:100%;height:12px;background:#dbe8f6;border-radius:999px;overflow:hidden
+    }
+    .progress-fill{
+      height:100%;width:0%;background:linear-gradient(90deg,#29a3ff,var(--brand));transition:width .25s ease
+    }
+    .progress-text{font-weight:700;color:var(--brand)}
+    .score-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+    .score-card{background:#f8fbff;border:1px solid #d6e7fb;border-radius:14px;padding:14px}
+    .score-card h4{margin:0 0 6px;font-size:13px;color:var(--muted)}
+    .score-card .big{font-size:24px;font-weight:800;color:var(--brand)}
+    .section-box{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+    .question{padding:12px 0;border-bottom:1px dashed #e4edf8}
     .question:last-child{border-bottom:none}
-    .question-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
-    .marks{font-size:13px;color:var(--muted);font-weight:700}
-    .option-group{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0}
-    .option-group label{display:flex;align-items:center;gap:6px;font-weight:500;margin:0}
-    .option-group input{width:auto;padding:0}
-    .score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
-    .score-card{background:#f8fbff;border:1px solid #d9e8fb;border-radius:12px;padding:12px}
-    .score-card .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .score-card .value{font-size:24px;font-weight:800;color:var(--primary)}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .question-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .marks{font-size:12px;color:var(--muted);font-weight:700}
+    .options{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
+    .options label{display:flex;align-items:center;gap:6px;margin:0;font-weight:500}
+    .options input{width:auto;padding:0}
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+    .photo-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff}
+    .photo-card h4{margin:0 0 10px;font-size:15px}
+    .photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .upload-status{font-size:12px;margin-top:8px;word-break:break-word}
+    .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+    .preview{background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px}
+    .preview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
+    .preview span{display:block;font-size:11px;color:var(--muted);margin-top:6px}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .top-actions button{max-width:220px}
+    .sticky-submit{
+      position:sticky;bottom:10px;z-index:20;background:rgba(244,247,251,.92);
+      backdrop-filter:blur(8px);padding-top:8px
+    }
     .small{font-size:12px;color:var(--muted)}
-    .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
-    .preview-card{border:1px solid var(--border);border-radius:10px;padding:8px;background:#fafcff}
-    .preview-card img{width:100%;height:110px;object-fit:cover;border-radius:8px}
-    .preview-card .cap{font-size:11px;color:var(--muted);margin-top:6px;word-break:break-word}
-    .upload-status{font-size:12px;margin-top:4px}
-    .row-actions{display:flex;gap:12px;flex-wrap:wrap}
-    .row-actions button{max-width:260px}
-    .search-input{margin-top:8px}
-    .photo-slot{border:1px solid var(--border);padding:12px;border-radius:12px;background:#fbfdff}
     @media (max-width:640px){
-      .question-top{flex-direction:column}
+      .hero h1{font-size:22px}
+      .photo-actions{grid-template-columns:1fr}
+      .app{padding:12px}
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div>
-        <h1>Daikin DSP Audit App</h1>
-        <div class="small">Region → Branch → DSP → Location → Photos → Audit Submit</div>
+  <div class="app">
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>Daikin DSP Audit</h1>
+          <p>Merchandiser retail compliance audit with image proof, checklist scoring, and mobile-first flow.</p>
+        </div>
+        <div class="badge">Production UI Preview</div>
       </div>
-      <div class="pill">Default Password: Daikin@123</div>
     </div>
 
     <div id="loginCard" class="card">
-      <h2>Login</h2>
+      <h2 class="section-title">Login</h2>
       <div class="grid">
         <div>
-          <label for="employeeId">Employee ID</label>
-          <input id="employeeId" type="text" placeholder="DAI1001">
+          <label>Employee ID</label>
+          <input id="employeeId" type="text" placeholder="Enter Employee ID">
         </div>
         <div>
-          <label for="password">Password</label>
-          <input id="password" type="password" value="Daikin@123" placeholder="Enter password">
+          <label>Password</label>
+          <input id="password" type="password" value="Daikin@123" placeholder="Enter Password">
         </div>
       </div>
-      <div style="margin-top:14px;">
+      <div class="top-actions" style="margin-top:14px;">
         <button onclick="login()">Login</button>
       </div>
       <div id="loginMsg" class="msg"></div>
@@ -95,12 +129,17 @@
 
     <div id="appCard" class="hidden">
       <div class="card">
-        <div class="topbar">
-          <div>
-            <h2>Start New Audit</h2>
-            <div class="small">Click capture location before final submit</div>
-          </div>
-          <button style="max-width:160px;" onclick="logout()">Logout</button>
+        <h2 class="section-title">Audit Progress</h2>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+          <div id="progressText" class="progress-text">0%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+          <h2 class="section-title" style="margin:0;">Audit Details</h2>
+          <button class="btn-danger" style="max-width:150px;" onclick="logout()">Logout</button>
         </div>
 
         <div class="grid">
@@ -124,37 +163,37 @@
 
         <div class="grid" style="margin-top:14px;">
           <div>
-            <label>Select Region</label>
+            <label>Region</label>
             <select id="regionSelect" onchange="onRegionChange()">
               <option value="">Select Region</option>
             </select>
           </div>
           <div>
-            <label>Select Branch</label>
+            <label>Branch</label>
             <select id="branchSelect" onchange="onBranchChange()">
               <option value="">Select Branch</option>
             </select>
           </div>
           <div>
             <label>Search DSP</label>
-            <input id="dspSearch" class="search-input" type="text" placeholder="Type DSP Code / Name / Dealer" oninput="filterDSPs()">
+            <input id="dspSearch" type="text" placeholder="Search DSP / Dealer / Code" oninput="filterDSPs()">
           </div>
           <div>
-            <label>Select DSP Store</label>
+            <label>DSP Store</label>
             <select id="dspSelect" onchange="loadStoreDetails()">
               <option value="">Select DSP</option>
             </select>
           </div>
         </div>
 
-        <div style="margin-top:14px;max-width:320px;">
-          <button onclick="captureLocation()">Capture Latitude / Longitude</button>
+        <div style="margin-top:14px;max-width:280px;">
+          <button onclick="captureLocation()">Capture GPS Location</button>
         </div>
         <div id="gpsMsg" class="msg"></div>
       </div>
 
       <div class="card">
-        <h3>Store Details</h3>
+        <h2 class="section-title">Store Information</h2>
         <div class="grid">
           <div><label>DSP Code</label><input id="dspCode" readonly></div>
           <div><label>DSP Name</label><input id="dspName" readonly></div>
@@ -169,83 +208,122 @@
       </div>
 
       <div class="card">
-        <h3>Photo Capture</h3>
-        <div class="small">Shopfront photo is mandatory. Store photos have 5 separate slots; at least 1 of them is mandatory.</div>
+        <h2 class="section-title">Photo Evidence</h2>
+        <div class="small">Issue explanation: on some Android Chrome versions, camera may not appear in the normal image picker. So each slot below has both <strong>Take Photo</strong> and <strong>Upload</strong> buttons for reliability. [web:185][web:188]</div>
 
-        <div class="grid" style="margin-top:12px;">
-          <div class="photo-slot">
-            <label>Shopfront Photo (Mandatory)</label>
-            <input id="shopfrontPhoto" type="file" accept="image/*" onchange="handleShopfrontChange(event)">
+        <div class="photo-grid" style="margin-top:14px;">
+          <div class="photo-card">
+            <h4>Shopfront Photo <span class="err">*</span></h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('shopfront')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('shopfront')">Upload</button>
+            </div>
+            <input id="shopfront_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleShopfrontFile(event)">
+            <input id="shopfront_upload" class="hidden" type="file" accept="image/*" onchange="handleShopfrontFile(event)">
             <div id="shopfrontMsg" class="upload-status"></div>
           </div>
 
-          <div class="photo-slot">
-            <label>Store Photo 1</label>
-            <input id="storePhoto1" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 1)">
+          <div class="photo-card">
+            <h4>Store Photo 1</h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('store1')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('store1')">Upload</button>
+            </div>
+            <input id="store1_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,1)">
+            <input id="store1_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,1)">
             <div id="storePhoto1Msg" class="upload-status"></div>
           </div>
 
-          <div class="photo-slot">
-            <label>Store Photo 2</label>
-            <input id="storePhoto2" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 2)">
+          <div class="photo-card">
+            <h4>Store Photo 2</h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('store2')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('store2')">Upload</button>
+            </div>
+            <input id="store2_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,2)">
+            <input id="store2_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,2)">
             <div id="storePhoto2Msg" class="upload-status"></div>
           </div>
 
-          <div class="photo-slot">
-            <label>Store Photo 3</label>
-            <input id="storePhoto3" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 3)">
+          <div class="photo-card">
+            <h4>Store Photo 3</h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('store3')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('store3')">Upload</button>
+            </div>
+            <input id="store3_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,3)">
+            <input id="store3_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,3)">
             <div id="storePhoto3Msg" class="upload-status"></div>
           </div>
 
-          <div class="photo-slot">
-            <label>Store Photo 4</label>
-            <input id="storePhoto4" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 4)">
+          <div class="photo-card">
+            <h4>Store Photo 4</h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('store4')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('store4')">Upload</button>
+            </div>
+            <input id="store4_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,4)">
+            <input id="store4_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,4)">
             <div id="storePhoto4Msg" class="upload-status"></div>
           </div>
 
-          <div class="photo-slot">
-            <label>Store Photo 5</label>
-            <input id="storePhoto5" type="file" accept="image/*" onchange="handleStorePhotoChange(event, 5)">
+          <div class="photo-card">
+            <h4>Store Photo 5</h4>
+            <div class="photo-actions">
+              <button type="button" onclick="openCamera('store5')">Take Photo</button>
+              <button type="button" class="btn-secondary" onclick="openUpload('store5')">Upload</button>
+            </div>
+            <input id="store5_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,5)">
+            <input id="store5_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,5)">
             <div id="storePhoto5Msg" class="upload-status"></div>
           </div>
         </div>
 
-        <div class="row-actions" style="margin-top:14px;">
+        <div class="top-actions" style="margin-top:14px;">
           <button id="uploadPhotosBtn" onclick="uploadAllPhotos()">Compress & Upload Photos</button>
         </div>
-
-        <div class="preview-grid" id="photoPreviewGrid"></div>
         <div id="uploadMsg" class="msg"></div>
+        <div id="photoPreviewGrid" class="preview-grid"></div>
       </div>
 
       <div class="card">
-        <h3>Audit Checklist</h3>
-        <div id="auditSections"></div>
+        <h2 class="section-title">Section-wise Score</h2>
+        <div id="sectionScoreCards" class="score-row"></div>
+      </div>
 
-        <div class="score-grid">
+      <div class="card">
+        <h2 class="section-title">Audit Checklist</h2>
+        <div id="auditSections"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Final Summary</h2>
+        <div class="score-row">
           <div class="score-card">
-            <div class="label">Final Score</div>
-            <div class="value" id="finalScore">0.00</div>
+            <h4>Final Score</h4>
+            <div class="big" id="finalScore">0.00</div>
           </div>
           <div class="score-card">
-            <div class="label">Compliance %</div>
-            <div class="value" id="compliancePercent">0%</div>
+            <h4>Compliance %</h4>
+            <div class="big" id="compliancePercent">0.00%</div>
           </div>
           <div class="score-card">
-            <div class="label">Grade</div>
-            <div class="value" id="grade">Pending</div>
+            <h4>Grade</h4>
+            <div class="big" id="grade">Pending</div>
           </div>
         </div>
 
         <div style="margin-top:16px;">
           <label>Overall Remarks</label>
-          <textarea id="overallRemarks" placeholder="Enter overall remarks"></textarea>
+          <textarea id="overallRemarks" placeholder="Enter comments, issues, missing branding, hygiene observations, staff compliance notes"></textarea>
         </div>
+      </div>
 
-        <div style="margin-top:16px;">
+      <div class="sticky-submit">
+        <div class="card" style="margin-top:0;">
           <button id="submitAuditBtn" onclick="submitAudit()">Submit Audit</button>
+          <div id="submitMsg" class="msg"></div>
         </div>
-        <div id="submitMsg" class="msg"></div>
       </div>
     </div>
   </div>
@@ -265,13 +343,7 @@
     let locationCapturedAt = "";
 
     let shopfrontFile = null;
-    let storePhotoFiles = {
-      1: null,
-      2: null,
-      3: null,
-      4: null,
-      5: null
-    };
+    let storePhotoFiles = {1:null,2:null,3:null,4:null,5:null};
 
     let uploadedPhotoUrls = {
       shopfrontPhotoURL: "",
@@ -290,12 +362,8 @@
 
     async function parseResponse(res) {
       const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        console.error("Raw API response:", text);
-        return { success:false, message:"Invalid API response", raw:text };
-      }
+      try { return JSON.parse(text); }
+      catch(e) { return { success:false, message:"Invalid API response", raw:text }; }
     }
 
     async function login() {
@@ -315,7 +383,7 @@
         const data = await parseResponse(res);
 
         if (!data.success) {
-          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Login failed.")}</span>`;
+          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Login failed")}</span>`;
           return;
         }
 
@@ -328,83 +396,64 @@
 
         populateRegions();
         renderCriteria();
+        renderSectionScoreCards();
         setNow();
+        updateProgress();
 
         document.getElementById("loginCard").classList.add("hidden");
         document.getElementById("appCard").classList.remove("hidden");
-      } catch (e) {
+      } catch (err) {
         msg.innerHTML = `<span class="err">Unable to connect to server.</span>`;
       }
     }
 
-    function logout() {
-      location.reload();
-    }
+    function logout() { location.reload(); }
 
     function populateRegions() {
       const regions = [...new Set(mappedStores.map(s => (s.Region || "").trim()).filter(Boolean))].sort();
       const sel = document.getElementById("regionSelect");
       sel.innerHTML = `<option value="">Select Region</option>`;
-      regions.forEach(r => {
-        sel.innerHTML += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`;
-      });
+      regions.forEach(r => sel.innerHTML += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`);
     }
 
     function onRegionChange() {
       const region = document.getElementById("regionSelect").value;
-      const branches = [...new Set(
-        mappedStores
-          .filter(s => (s.Region || "").trim() === region)
-          .map(s => (s.Branch || "").trim())
-          .filter(Boolean)
-      )].sort();
-
+      const branches = [...new Set(mappedStores.filter(s => (s.Region || "").trim() === region).map(s => (s.Branch || "").trim()).filter(Boolean))].sort();
       const branchSel = document.getElementById("branchSelect");
       branchSel.innerHTML = `<option value="">Select Branch</option>`;
-      branches.forEach(b => {
-        branchSel.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
-      });
-
+      branches.forEach(b => branchSel.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`);
       document.getElementById("dspSelect").innerHTML = `<option value="">Select DSP</option>`;
       document.getElementById("dspSearch").value = "";
       branchStores = [];
       filteredStores = [];
       clearStoreDetails();
       resetLocation();
+      updateProgress();
     }
 
     function onBranchChange() {
       const region = document.getElementById("regionSelect").value;
       const branch = document.getElementById("branchSelect").value;
-
-      branchStores = mappedStores.filter(s =>
-        (s.Region || "").trim() === region &&
-        (s.Branch || "").trim() === branch
-      );
-
+      branchStores = mappedStores.filter(s => (s.Region || "").trim() === region && (s.Branch || "").trim() === branch);
       filteredStores = [...branchStores];
       populateDSPDropdown(filteredStores);
       clearStoreDetails();
       resetLocation();
+      updateProgress();
     }
 
     function filterDSPs() {
       const keyword = document.getElementById("dspSearch").value.trim().toLowerCase();
-
-      if (!keyword) {
-        filteredStores = [...branchStores];
-      } else {
-        filteredStores = branchStores.filter(s => {
-          const code = (s.DSPCode || "").toLowerCase();
-          const name = (s.DSPName || "").toLowerCase();
-          const dealer = (s.DealerName || "").toLowerCase();
-          return code.includes(keyword) || name.includes(keyword) || dealer.includes(keyword);
-        });
-      }
-
+      filteredStores = !keyword ? [...branchStores] : branchStores.filter(s => {
+        const code = (s.DSPCode || "").toLowerCase();
+        const name = (s.DSPName || "").toLowerCase();
+        const dealer = (s.DealerName || "").toLowerCase();
+        return code.includes(keyword) || name.includes(keyword) || dealer.includes(keyword);
+      });
       populateDSPDropdown(filteredStores);
       clearStoreDetails();
       resetLocation();
+      updateProgress();
     }
 
     function populateDSPDropdown(stores) {
@@ -418,7 +467,6 @@
     function loadStoreDetails() {
       const idx = document.getElementById("dspSelect").value;
       currentStore = filteredStores[idx] || null;
-
       const setVal = (id, val) => document.getElementById(id).value = val || "";
       setVal("dspCode", currentStore?.DSPCode);
       setVal("dspName", currentStore?.DSPName);
@@ -429,8 +477,8 @@
       setVal("state", currentStore?.State);
       setVal("isdDeployment", currentStore?.ISDDeployment);
       setVal("asmName", currentStore?.ASMName);
-
       resetLocation();
+      updateProgress();
     }
 
     function clearStoreDetails() {
@@ -448,57 +496,63 @@
 
     function captureLocation() {
       const msg = document.getElementById("gpsMsg");
-
       if (!currentStore) {
         msg.innerHTML = `<span class="err">Please select DSP before capturing location.</span>`;
         return;
       }
-
       if (!navigator.geolocation) {
         msg.innerHTML = `<span class="err">Geolocation is not supported in this browser.</span>`;
         return;
       }
-
       msg.innerHTML = `<span class="warn">Capturing location...</span>`;
-
       navigator.geolocation.getCurrentPosition(
         pos => {
           capturedLatitude = pos.coords.latitude.toFixed(6);
           capturedLongitude = pos.coords.longitude.toFixed(6);
           locationCapturedAt = new Date().toISOString();
-          msg.innerHTML = `<span class="ok">Latitude: ${capturedLatitude}, Longitude: ${capturedLongitude}</span>`;
+          msg.innerHTML = `<span class="ok">Location captured: ${capturedLatitude}, ${capturedLongitude}</span>`;
+          updateProgress();
         },
         () => {
-          msg.innerHTML = `<span class="err">Unable to capture location. Please allow GPS permission and try again.</span>`;
+          msg.innerHTML = `<span class="err">Unable to capture location. Please allow GPS permission.</span>`;
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
       );
     }
 
-    function handleShopfrontChange(e) {
+    function openCamera(prefix) {
+      const el = document.getElementById(`${prefix}_camera`);
+      if (el) el.click();
+    }
+
+    function openUpload(prefix) {
+      const el = document.getElementById(`${prefix}_upload`);
+      if (el) el.click();
+    }
+
+    function handleShopfrontFile(e) {
       shopfrontFile = e.target.files[0] || null;
       uploadedPhotoUrls.shopfrontPhotoURL = "";
       document.getElementById("shopfrontMsg").innerHTML = shopfrontFile
         ? `<span class="ok">${escapeHtml(shopfrontFile.name)}</span>`
-        : `<span class="err">Shopfront photo is required.</span>`;
+        : `<span class="err">Shopfront photo required</span>`;
       renderPreviews();
+      updateProgress();
     }
 
-    function handleStorePhotoChange(e, slotNo) {
-      const file = e.target.files[0] || null;
-      storePhotoFiles[slotNo] = file;
+    function handleStorePhoto(e, slotNo) {
+      storePhotoFiles[slotNo] = e.target.files[0] || null;
       uploadedPhotoUrls[`storePhoto${slotNo}URL`] = "";
-
-      const msgEl = document.getElementById(`storePhoto${slotNo}Msg`);
-      msgEl.innerHTML = file
-        ? `<span class="ok">${escapeHtml(file.name)}</span>`
+      const msg = document.getElementById(`storePhoto${slotNo}Msg`);
+      msg.innerHTML = storePhotoFiles[slotNo]
+        ? `<span class="ok">${escapeHtml(storePhotoFiles[slotNo].name)}</span>`
         : `<span class="warn">No file selected</span>`;
-
       renderPreviews();
+      updateProgress();
     }
 
     function hasAtLeastOneStorePhoto() {
-      return Object.values(storePhotoFiles).some(file => !!file);
+      return Object.values(storePhotoFiles).some(Boolean);
     }
 
     function renderPreviews() {
@@ -506,43 +560,39 @@
       grid.innerHTML = "";
 
       if (shopfrontFile) {
-        const url = URL.createObjectURL(shopfrontFile);
-        grid.innerHTML += `
-          <div class="preview-card">
-            <img src="${url}" alt="Shopfront preview">
-            <div class="cap">Shopfront: ${escapeHtml(shopfrontFile.name)}</div>
-          </div>
-        `;
+        grid.innerHTML += previewHtml(shopfrontFile, "Shopfront");
       }
-
-      Object.keys(storePhotoFiles).forEach(slot => {
-        const file = storePhotoFiles[slot];
-        if (file) {
-          const url = URL.createObjectURL(file);
-          grid.innerHTML += `
-            <div class="preview-card">
-              <img src="${url}" alt="Store photo ${slot}">
-              <div class="cap">Store Photo ${slot}: ${escapeHtml(file.name)}</div>
-            </div>
-          `;
+      for (let i = 1; i <= 5; i++) {
+        if (storePhotoFiles[i]) {
+          grid.innerHTML += previewHtml(storePhotoFiles[i], `Store Photo ${i}`);
         }
-      });
+      }
+    }
+
+    function previewHtml(file, title) {
+      const url = URL.createObjectURL(file);
+      return `
+        <div class="preview">
+          <img src="${url}" alt="${escapeHtml(title)}">
+          <span>${escapeHtml(title)}: ${escapeHtml(file.name)}</span>
+        </div>
+      `;
     }
 
     function renderCriteria() {
       const root = document.getElementById("auditSections");
       root.innerHTML = "";
-
       const grouped = {};
+
       criteriaList.forEach(c => {
         if (!grouped[c.SectionName]) grouped[c.SectionName] = [];
         grouped[c.SectionName].push(c);
       });
 
       Object.keys(grouped).forEach(section => {
-        const block = document.createElement("div");
-        block.className = "section-block";
-        block.innerHTML = `<h4>${escapeHtml(section)}</h4>`;
+        const box = document.createElement("div");
+        box.className = "section-box";
+        box.innerHTML = `<h3 style="margin:0 0 12px;color:var(--brand);">${escapeHtml(section)}</h3>`;
 
         grouped[section].forEach((c, idx) => {
           const uid = `crit_${idx}_${c.CriteriaID}`;
@@ -551,33 +601,47 @@
           q.dataset.criteriaid = c.CriteriaID;
           q.dataset.sectionname = c.SectionName;
           q.dataset.parametername = c.ParameterName;
-          q.dataset.weightage = c.Weightage;
+          q.dataset.weightage = Number(c.Weightage || 0);
 
-          let optionsHtml = "";
+          let opts = "";
           (c.Options || []).forEach(opt => {
-            optionsHtml += `
+            opts += `
               <label>
                 <input type="radio"
                        name="${uid}"
-                       value="${opt.OptionPoints}"
+                       value="${Number(opt.OptionPoints || 0)}"
                        data-label="${escapeHtml(opt.OptionLabel)}"
                        onchange="calculateScore()">
                 ${escapeHtml(opt.OptionLabel)}
-              </label>
-            `;
+              </label>`;
           });
 
           q.innerHTML = `
-            <div class="question-top">
+            <div class="question-head">
               <div><strong>${escapeHtml(c.ParameterName)}</strong></div>
               <div class="marks">Weightage: ${Number(c.Weightage || 0).toFixed(2)}</div>
             </div>
-            <div class="option-group">${optionsHtml}</div>
+            <div class="options">${opts}</div>
           `;
-          block.appendChild(q);
+          box.appendChild(q);
         });
 
-        root.appendChild(block);
+        root.appendChild(box);
+      });
+    }
+
+    function renderSectionScoreCards() {
+      const sections = [...new Set(criteriaList.map(c => c.SectionName).filter(Boolean))];
+      const root = document.getElementById("sectionScoreCards");
+      root.innerHTML = "";
+      sections.forEach(sec => {
+        const id = slugify(sec);
+        root.innerHTML += `
+          <div class="score-card">
+            <h4>${escapeHtml(sec)}</h4>
+            <div class="big" id="section_${id}">0.00</div>
+          </div>
+        `;
       });
     }
 
@@ -585,19 +649,31 @@
       const questions = [...document.querySelectorAll(".question")];
       let total = 0;
       let maxTotal = 0;
+      const sectionScores = {};
 
       questions.forEach(q => {
-        const weightage = Number(q.dataset.weightage || 0);
-        const selected = q.querySelector("input[type='radio']:checked");
-        maxTotal += weightage;
+        const sec = q.dataset.sectionname || "";
+        const weight = Number(q.dataset.weightage || 0);
+        const sel = q.querySelector("input[type='radio']:checked");
 
-        if (selected) {
-          const points = Number(selected.value || 0);
-          total += weightage * points;
+        maxTotal += weight;
+        if (!sectionScores[sec]) sectionScores[sec] = 0;
+
+        if (sel) {
+          const points = Number(sel.value || 0);
+          const weighted = weight * points;
+          total += weighted;
+          sectionScores[sec] += weighted;
         }
       });
 
-      const compliance = maxTotal ? ((total / maxTotal) * 100) : 0;
+      Object.keys(sectionScores).forEach(sec => {
+        const id = `section_${slugify(sec)}`;
+        const el = document.getElementById(id);
+        if (el) el.textContent = sectionScores[sec].toFixed(2);
+      });
+
+      const compliance = maxTotal ? (total / maxTotal) * 100 : 0;
       let grade = "Needs Improvement";
       if (compliance >= 90) grade = "Excellent";
       else if (compliance >= 80) grade = "Good";
@@ -606,6 +682,8 @@
       document.getElementById("finalScore").textContent = total.toFixed(2);
       document.getElementById("compliancePercent").textContent = compliance.toFixed(2) + "%";
       document.getElementById("grade").textContent = grade;
+
+      updateProgress();
     }
 
     function getResponsesJSON() {
@@ -613,26 +691,26 @@
       const rows = [];
 
       for (const q of questions) {
-        const selected = q.querySelector("input[type='radio']:checked");
-        if (!selected) {
-          return { ok:false, message:`Please answer all checklist items.` };
+        const sel = q.querySelector("input[type='radio']:checked");
+        if (!sel) {
+          return { ok:false, message:"Please answer all checklist items." };
         }
 
-        const weightage = Number(q.dataset.weightage || 0);
-        const points = Number(selected.value || 0);
+        const weight = Number(q.dataset.weightage || 0);
+        const pts = Number(sel.value || 0);
 
         rows.push({
           CriteriaID: q.dataset.criteriaid,
           SectionName: q.dataset.sectionname,
           ParameterName: q.dataset.parametername,
-          Weightage: weightage,
-          SelectedOption: selected.dataset.label || "",
-          SelectedPoints: points,
-          WeightedScore: Number((weightage * points).toFixed(2))
+          Weightage: weight,
+          SelectedOption: sel.dataset.label || "",
+          SelectedPoints: pts,
+          WeightedScore: Number((weight * pts).toFixed(2))
         });
       }
 
-      return { ok:true, data: rows };
+      return { ok:true, data:rows };
     }
 
     async function compressImage(file, maxWidth = 1600, quality = 0.75) {
@@ -652,10 +730,8 @@
 
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-
             canvas.toBlob(blob => resolve(blob), "image/jpeg", quality);
           };
           img.src = e.target.result;
@@ -692,11 +768,7 @@
       });
 
       const data = await parseResponse(res);
-
-      if (!data.success) {
-        throw new Error(data.message || `${label} upload failed`);
-      }
-
+      if (!data.success) throw new Error(data.message || `${label} upload failed`);
       return data.fileUrl;
     }
 
@@ -708,7 +780,6 @@
         msg.innerHTML = `<span class="err">Shopfront photo is mandatory.</span>`;
         return false;
       }
-
       if (!hasAtLeastOneStorePhoto()) {
         msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
         return false;
@@ -716,7 +787,7 @@
 
       try {
         document.getElementById("uploadPhotosBtn").disabled = true;
-        msg.innerHTML = `<span class="warn">Uploading photos, please wait...</span>`;
+        msg.innerHTML = `<span class="warn">Uploading photos...</span>`;
 
         if (shopfrontFile && !uploadedPhotoUrls.shopfrontPhotoURL) {
           uploadedPhotoUrls.shopfrontPhotoURL = await uploadSingleFile(shopfrontFile, "Shopfront");
@@ -730,10 +801,11 @@
           }
         }
 
-        msg.innerHTML = `<span class="ok">Selected photos uploaded successfully.</span>`;
+        msg.innerHTML = `<span class="ok">Photos uploaded successfully.</span>`;
+        updateProgress();
         return true;
       } catch (e) {
-        msg.innerHTML = `<span class="err">${escapeHtml(e.message || "Photo upload failed.")}</span>`;
+        msg.innerHTML = `<span class="err">${escapeHtml(e.message || "Photo upload failed")}</span>`;
         return false;
       } finally {
         document.getElementById("uploadPhotosBtn").disabled = false;
@@ -748,17 +820,14 @@
         msg.innerHTML = `<span class="err">Please select DSP store.</span>`;
         return;
       }
-
       if (!capturedLatitude || !capturedLongitude) {
-        msg.innerHTML = `<span class="err">Please click "Capture Latitude / Longitude" before submit.</span>`;
+        msg.innerHTML = `<span class="err">Please capture GPS location before submit.</span>`;
         return;
       }
-
       if (!shopfrontFile) {
         msg.innerHTML = `<span class="err">Shopfront photo is mandatory.</span>`;
         return;
       }
-
       if (!hasAtLeastOneStorePhoto()) {
         msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
         return;
@@ -770,8 +839,8 @@
         return;
       }
 
-      const ok = await uploadAllPhotos();
-      if (!ok) return;
+      const uploaded = await uploadAllPhotos();
+      if (!uploaded) return;
 
       try {
         document.getElementById("submitAuditBtn").disabled = true;
@@ -820,16 +889,43 @@
         const data = await parseResponse(res);
 
         if (!data.success) {
-          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Submit failed.")}</span>`;
+          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Submit failed")}</span>`;
           return;
         }
 
         msg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${escapeHtml(data.auditId || "")}</span>`;
+        updateProgress(true);
       } catch (e) {
         msg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
       } finally {
         document.getElementById("submitAuditBtn").disabled = false;
       }
+    }
+
+    function updateProgress(forceComplete = false) {
+      let completed = 0;
+      let total = 5;
+
+      if (currentStore) completed++;
+      if (capturedLatitude && capturedLongitude) completed++;
+      if (shopfrontFile) completed++;
+      if (hasAtLeastOneStorePhoto()) completed++;
+
+      const questions = [...document.querySelectorAll(".question")];
+      if (questions.length) {
+        const answered = questions.filter(q => q.querySelector("input[type='radio']:checked")).length;
+        if (answered === questions.length) completed++;
+      }
+
+      let pct = Math.round((completed / total) * 100);
+      if (forceComplete) pct = 100;
+
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressText").textContent = pct + "%";
+    }
+
+    function slugify(s) {
+      return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_");
     }
 
     function escapeHtml(value) {
