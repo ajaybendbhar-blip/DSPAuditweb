@@ -68,15 +68,9 @@
     <div class="topbar">
       <div>
         <h1>Daikin DSP Audit App</h1>
-        <div class="small">Latest version with scoring grid, GPS reference capture, and image upload</div>
+        <div class="small">Single-row DSP audit capture with photo upload and scoring grid</div>
       </div>
       <div class="pill">Default Password: Daikin@123</div>
-    </div>
-
-    <div class="card">
-      <h3>API status</h3>
-      <button onclick="checkApi()">Check API connection</button>
-      <div id="apiMsg" class="msg"></div>
     </div>
 
     <div id="loginCard" class="card">
@@ -102,7 +96,7 @@
         <div class="topbar">
           <div>
             <h2>Start new audit</h2>
-            <div class="small">Location is captured only for reference and will not block submission</div>
+            <div class="small">Location is captured only for future reference</div>
           </div>
           <button style="max-width:160px;" onclick="logout()">Logout</button>
         </div>
@@ -157,8 +151,7 @@
           <div><label>DSP Code</label><input id="dspCode" readonly></div>
           <div><label>DSP Name</label><input id="dspName" readonly></div>
           <div><label>Dealer Name</label><input id="dealerName" readonly></div>
-          <div><label>Owner Name</label><input id="ownerName" readonly></div>
-          <div><label>Owner Number</label><input id="ownerNumber" readonly></div>
+          <div><label>Dealer Number</label><input id="ownerNumber" readonly></div>
           <div><label>City</label><input id="city" readonly></div>
           <div><label>Pincode</label><input id="pincode" readonly></div>
           <div><label>State</label><input id="state" readonly></div>
@@ -169,7 +162,7 @@
 
       <div class="card">
         <h3>Photo capture</h3>
-        <div class="small">Mandatory: 1 shopfront photo + at least 1 store photo. You can upload up to 5 store photos.</div>
+        <div class="small">Mandatory: 1 shopfront photo + at least 1 store photo. Maximum 5 store photos.</div>
 
         <div class="grid" style="margin-top:12px;">
           <div>
@@ -213,7 +206,7 @@
 
         <div style="margin-top:16px;">
           <label>Overall Remarks</label>
-          <textarea id="overallRemarks" placeholder="Enter audit remarks"></textarea>
+          <textarea id="overallRemarks" placeholder="Enter overall remarks"></textarea>
         </div>
 
         <div style="margin-top:16px;">
@@ -225,7 +218,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbwjxCK9_4v_GqSUfcRnvFaPtfGj0XNuLFxg_MU0CMbXrx2FrKC1PaM4xni5oIn56Lw_Zw/exec";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbwWS27on9EcsecAUvzRmqanE1BsaR80G3oIUk_uWIjXiLy2CoRRu-030Bm4ICxo7cq0fg/exec";
 
     let currentUser = null;
     let mappedStores = [];
@@ -259,20 +252,6 @@
         return JSON.parse(text);
       } catch (e) {
         return { success:false, message:"Invalid API response", raw:text };
-      }
-    }
-
-    async function checkApi() {
-      const box = document.getElementById("apiMsg");
-      box.innerHTML = `<span class="warn">Checking API...</span>`;
-      try {
-        const res = await fetch(API_BASE + "?ping=1");
-        const data = await parseResponse(res);
-        box.innerHTML = data.success
-          ? `<span class="ok">API reachable and working.</span>`
-          : `<span class="err">${data.message || "API returned error."}</span>`;
-      } catch (e) {
-        box.innerHTML = `<span class="err">API not reachable.</span>`;
       }
     }
 
@@ -365,7 +344,6 @@
       setVal("dspCode", currentStore?.DSPCode);
       setVal("dspName", currentStore?.DSPName);
       setVal("dealerName", currentStore?.DealerName);
-      setVal("ownerName", currentStore?.OwnerName);
       setVal("ownerNumber", currentStore?.OwnerNumber);
       setVal("city", currentStore?.City);
       setVal("pincode", currentStore?.Pincode);
@@ -421,7 +399,6 @@
           q.dataset.sectionname = c.SectionName;
           q.dataset.parametername = c.ParameterName;
           q.dataset.weightage = c.Weightage;
-          q.dataset.actioncategory = c.ActionCategory;
 
           let optionsHtml = "";
           (c.Options || []).forEach(opt => {
@@ -441,9 +418,9 @@
             <div class="question-top">
               <div>
                 <strong>${escapeHtml(c.ParameterName)}</strong><br>
-                <span class="small">Weightage: ${c.Weightage} | Action: ${escapeHtml(c.ActionCategory || "")}</span>
+                <span class="small">Weightage: ${c.Weightage}</span>
               </div>
-              <div class="marks">Points based: 10 / 6 / 3</div>
+              <div class="marks">Points: 10 / 6 / 3</div>
             </div>
             <div class="option-group">${optionsHtml}</div>
           `;
@@ -493,8 +470,7 @@
           SelectedOption: selected ? selected.dataset.label : "",
           SelectedPoints: selected ? Number(selected.value) : 0,
           Weightage: Number(row.dataset.weightage || 0),
-          WeightedScore: selected ? Number((Number(row.dataset.weightage || 0) * Number(selected.value)).toFixed(2)) : 0,
-          ActionCategory: row.dataset.actioncategory || ""
+          WeightedScore: selected ? Number((Number(row.dataset.weightage || 0) * Number(selected.value)).toFixed(2)) : 0
         });
       });
 
@@ -715,13 +691,13 @@
       body.append("employeeId", currentUser.EmployeeID || "");
       body.append("employeeName", currentUser.EmployeeName || "");
       body.append("role", currentUser.Role || "");
+      body.append("region", currentStore.Region || "");
+      body.append("branch", currentStore.Branch || "");
       body.append("dspCode", currentStore.DSPCode || "");
       body.append("dspName", currentStore.DSPName || "");
       body.append("dealerName", currentStore.DealerName || "");
-      body.append("ownerName", currentStore.OwnerName || "");
+      body.append("ownerName", currentStore.DealerName || "");
       body.append("ownerNumber", currentStore.OwnerNumber || "");
-      body.append("region", currentStore.Region || "");
-      body.append("branch", currentStore.Branch || "");
       body.append("city", currentStore.City || "");
       body.append("pincode", currentStore.Pincode || "");
       body.append("state", currentStore.State || "");
@@ -730,16 +706,16 @@
       body.append("capturedLatitude", capturedLatitude || "");
       body.append("capturedLongitude", capturedLongitude || "");
       body.append("locationCapturedAt", locationCapturedAt || "");
-      body.append("finalScore", document.getElementById("finalScore").textContent);
-      body.append("compliancePercent", document.getElementById("compliancePercent").textContent.replace("%",""));
-      body.append("grade", document.getElementById("grade").textContent);
-      body.append("overallRemarks", document.getElementById("overallRemarks").value.trim());
       body.append("shopfrontPhotoURL", uploadedPhotoUrls.shopfrontPhotoURL || "");
       body.append("storePhoto1URL", uploadedPhotoUrls.storePhoto1URL || "");
       body.append("storePhoto2URL", uploadedPhotoUrls.storePhoto2URL || "");
       body.append("storePhoto3URL", uploadedPhotoUrls.storePhoto3URL || "");
       body.append("storePhoto4URL", uploadedPhotoUrls.storePhoto4URL || "");
       body.append("storePhoto5URL", uploadedPhotoUrls.storePhoto5URL || "");
+      body.append("finalScore", document.getElementById("finalScore").textContent);
+      body.append("compliancePercent", document.getElementById("compliancePercent").textContent.replace("%",""));
+      body.append("grade", document.getElementById("grade").textContent);
+      body.append("overallRemarks", document.getElementById("overallRemarks").value.trim());
       body.append("responsesJSON", JSON.stringify(responses));
 
       try {
