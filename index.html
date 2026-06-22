@@ -196,7 +196,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbx2feRNowy8Hx_Fj1C99-fI4sFs0GXfqEK8ZwI0zI9J11GayWR5X4ir3dSfFl0k2aBR0g/exec";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbxBmZgcRr9SCeRO6sfboTnurW3Oyw_RWSYeHYeSb2VCXVYjYgL6d5IPqjI6_ku5wjMAgQ/exec";
 
     let currentUser = null;
     let mappedStores = [];
@@ -291,14 +291,14 @@
       box.innerHTML = `<span class="warn">Checking API...</span>`;
       try {
         const res = await fetch(API_BASE + "?ping=1", { method:"GET" });
-        const data = await parseResponse(res);
+        await parseResponse(res);
         if (res.ok) {
           box.innerHTML = `<span class="ok">API reachable.</span>`;
         } else {
           box.innerHTML = `<span class="err">API returned error.</span>`;
         }
       } catch (e) {
-        box.innerHTML = `<span class="err">API not reachable. Check Apps Script deployment access and CORS behavior.</span>`;
+        box.innerHTML = `<span class="err">API not reachable. Check Apps Script deployment access.</span>`;
       }
     }
 
@@ -329,10 +329,10 @@
           setNow();
           renderAuditSections();
         } else {
-          msg.innerHTML = `<span class="err">${data.message || "Login failed. Check Apps Script doGet handling."}</span>`;
+          msg.innerHTML = `<span class="err">${data.message || "Login failed."}</span>`;
         }
       } catch (e) {
-        msg.innerHTML = `<span class="err">Unable to connect to server. Please check Apps Script deployment permissions.</span>`;
+        msg.innerHTML = `<span class="err">Unable to connect to server.</span>`;
       }
     }
 
@@ -426,7 +426,7 @@
             msg.innerHTML = `<span class="err">You are ${currentDistance} meters away. Please visit the store.</span>`;
           }
         },
-        err => {
+        () => {
           gpsValidated = false;
           msg.innerHTML = `<span class="err">Unable to capture location.</span>`;
         },
@@ -528,10 +528,10 @@
           submitMsg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${result.auditId || ""}</span>`;
           resetAuditForm();
         } else {
-          submitMsg.innerHTML = `<span class="err">${result.message || "Submission failed. Check Apps Script doPost logic."}</span>`;
+          submitMsg.innerHTML = `<span class="err">${result.message || "Submission failed."}</span>`;
         }
       } catch (e) {
-        submitMsg.innerHTML = `<span class="err">Unable to submit audit. This usually means Apps Script deployment or CORS issue.</span>`;
+        submitMsg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
       }
     }
 
