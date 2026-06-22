@@ -18,164 +18,38 @@
       --warning:#d97706;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .container{
-      max-width:1100px;
-      margin:24px auto;
-      padding:16px;
-    }
-    .card{
-      background:var(--card);
-      border-radius:14px;
-      box-shadow:0 8px 24px rgba(0,0,0,.08);
-      padding:20px;
-      margin-bottom:18px;
-      border:1px solid var(--border);
-    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1100px;margin:24px auto;padding:16px}
+    .card{background:var(--card);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:20px;margin-bottom:18px;border:1px solid var(--border)}
     h1,h2,h3,h4{margin:0 0 12px}
     h1{color:var(--primary)}
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:14px;
-    }
-    label{
-      display:block;
-      font-size:13px;
-      font-weight:700;
-      margin-bottom:6px;
-    }
-    input, select, textarea, button{
-      width:100%;
-      padding:11px 12px;
-      border:1px solid #cfd8e3;
-      border-radius:10px;
-      font:inherit;
-    }
-    textarea{min-height:80px; resize:vertical}
-    input[readonly]{
-      background:#f7f9fc;
-    }
-    button{
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      font-weight:700;
-      cursor:pointer;
-    }
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    input,select,textarea,button{width:100%;padding:11px 12px;border:1px solid #cfd8e3;border-radius:10px;font:inherit}
+    textarea{min-height:80px;resize:vertical}
+    input[readonly]{background:#f7f9fc}
+    button{background:var(--primary);color:#fff;border:none;font-weight:700;cursor:pointer}
     button:hover{background:var(--primary-dark)}
-    .row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .row > *{flex:1}
     .hidden{display:none}
-    .msg{
-      margin-top:10px;
-      font-size:14px;
-      font-weight:700;
-    }
+    .msg{margin-top:10px;font-size:14px;font-weight:700}
     .ok{color:var(--success)}
     .err{color:var(--danger)}
     .warn{color:var(--warning)}
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      background:#eef4ff;
-      color:var(--primary);
-      margin-bottom:10px;
-    }
-    .section-block{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px;
-      margin-top:14px;
-    }
-    .question{
-      padding:10px 0;
-      border-bottom:1px dashed #e4e9f0;
-    }
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#eef4ff;color:var(--primary);margin-bottom:10px}
+    .section-block{border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px}
+    .question{padding:10px 0;border-bottom:1px dashed #e4e9f0}
     .question:last-child{border-bottom:none}
-    .question-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-      margin-bottom:8px;
-    }
-    .marks{
-      min-width:70px;
-      text-align:right;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
-    }
-    .option-group{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
-      margin:8px 0;
-    }
-    .option-group label{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-weight:500;
-      margin:0;
-    }
-    .option-group input{
-      width:auto;
-      padding:0;
-    }
-    .score-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:12px;
-      margin-top:12px;
-    }
-    .score-card{
-      background:#f8fbff;
-      border:1px solid #d9e8fb;
-      border-radius:12px;
-      padding:12px;
-    }
-    .score-card .label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    .score-card .value{
-      font-size:24px;
-      font-weight:800;
-      color:var(--primary);
-    }
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-    }
-    .small{
-      font-size:12px;
-      color:var(--muted);
-    }
-    .footer-note{
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-      margin-top:10px;
-    }
+    .question-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
+    .marks{min-width:70px;text-align:right;font-size:13px;color:var(--muted);font-weight:700}
+    .option-group{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0}
+    .option-group label{display:flex;align-items:center;gap:6px;font-weight:500;margin:0}
+    .option-group input{width:auto;padding:0}
+    .score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+    .score-card{background:#f8fbff;border:1px solid #d9e8fb;border-radius:12px;padding:12px}
+    .score-card .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .score-card .value{font-size:24px;font-weight:800;color:var(--primary)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .small{font-size:12px;color:var(--muted)}
     @media (max-width:640px){
       .question-top{flex-direction:column}
       .marks{text-align:left}
@@ -187,9 +61,15 @@
     <div class="topbar">
       <div>
         <h1>Daikin DSP Audit App</h1>
-        <div class="small">Merchandiser audit application for DSP stores</div>
+        <div class="small">GitHub Pages + Google Apps Script</div>
       </div>
       <div class="pill">Field Audit v1</div>
+    </div>
+
+    <div class="card">
+      <h3>API Status</h3>
+      <button onclick="checkApi()">Check API Connection</button>
+      <div id="apiMsg" class="msg"></div>
     </div>
 
     <div id="loginCard" class="card">
@@ -284,7 +164,7 @@
             <input id="selfiePhoto" type="file" accept="image/*" capture="user">
           </div>
         </div>
-        <div class="small" style="margin-top:8px;">Current backend saves audit data. Photo upload integration to Drive can be added in the next version.</div>
+        <div class="small" style="margin-top:8px;">This version validates photo selection in browser. File upload API can be added in next step.</div>
       </div>
 
       <div class="card">
@@ -313,8 +193,6 @@
         <div id="submitMsg" class="msg"></div>
       </div>
     </div>
-
-    <div class="footer-note">Daikin DSP Audit Application</div>
   </div>
 
   <script>
@@ -329,111 +207,99 @@
     let gpsValidated = false;
 
     const auditSections = [
-      {
-        section: "Product Display",
-        max: 25,
-        items: [
-          { parameter: "RAC Display", marks: 5 },
-          { parameter: "Cassette Display", marks: 5 },
-          { parameter: "VRV Display", marks: 5 },
-          { parameter: "Deep Freezer Display", marks: 5 },
-          { parameter: "Tower Display", marks: 5 }
-        ]
-      },
-      {
-        section: "Branding Visibility",
-        max: 20,
-        items: [
-          { parameter: "Glow Sign Board", marks: 10 },
-          { parameter: "Internal Branding", marks: 5 },
-          { parameter: "Catalogues", marks: 5 }
-        ]
-      },
-      {
-        section: "POSM Availability",
-        max: 15,
-        items: [
-          { parameter: "Leaflets", marks: 3 },
-          { parameter: "Brochure", marks: 3 },
-          { parameter: "Exchange Offer Sticker", marks: 3 },
-          { parameter: "Finance Poster", marks: 3 },
-          { parameter: "New Product Poster", marks: 3 }
-        ]
-      },
-      {
-        section: "Staff Compliance",
-        max: 15,
-        items: [
-          { parameter: "Uniform", marks: 5 },
-          { parameter: "ID Card", marks: 5 },
-          { parameter: "Product Knowledge", marks: 5 }
-        ]
-      },
-      {
-        section: "Finance Activation",
-        max: 10,
-        items: [
-          { parameter: "Bajaj Finance", marks: 3 },
-          { parameter: "HDFC Finance", marks: 3 },
-          { parameter: "Exchange Offer", marks: 2 },
-          { parameter: "Cashback Offer", marks: 2 }
-        ]
-      },
-      {
-        section: "Store Hygiene",
-        max: 15,
-        items: [
-          { parameter: "Clean Floor", marks: 5 },
-          { parameter: "AC Dust Free", marks: 5 },
-          { parameter: "Lighting", marks: 5 }
-        ]
-      }
+      { section:"Product Display", max:25, items:[
+        {parameter:"RAC Display", marks:5},
+        {parameter:"Cassette Display", marks:5},
+        {parameter:"VRV Display", marks:5},
+        {parameter:"Deep Freezer Display", marks:5},
+        {parameter:"Tower Display", marks:5}
+      ]},
+      { section:"Branding Visibility", max:20, items:[
+        {parameter:"Glow Sign Board", marks:10},
+        {parameter:"Internal Branding", marks:5},
+        {parameter:"Catalogues", marks:5}
+      ]},
+      { section:"POSM Availability", max:15, items:[
+        {parameter:"Leaflets", marks:3},
+        {parameter:"Brochure", marks:3},
+        {parameter:"Exchange Offer Sticker", marks:3},
+        {parameter:"Finance Poster", marks:3},
+        {parameter:"New Product Poster", marks:3}
+      ]},
+      { section:"Staff Compliance", max:15, items:[
+        {parameter:"Uniform", marks:5},
+        {parameter:"ID Card", marks:5},
+        {parameter:"Product Knowledge", marks:5}
+      ]},
+      { section:"Finance Activation", max:10, items:[
+        {parameter:"Bajaj Finance", marks:3},
+        {parameter:"HDFC Finance", marks:3},
+        {parameter:"Exchange Offer", marks:2},
+        {parameter:"Cashback Offer", marks:2}
+      ]},
+      { section:"Store Hygiene", max:15, items:[
+        {parameter:"Clean Floor", marks:5},
+        {parameter:"AC Dust Free", marks:5},
+        {parameter:"Lighting", marks:5}
+      ]}
     ];
 
     function setNow() {
       const now = new Date();
       document.getElementById("auditDate").value = now.toISOString().split("T")[0];
-      const hh = String(now.getHours()).padStart(2, "0");
-      const mm = String(now.getMinutes()).padStart(2, "0");
-      document.getElementById("auditTime").value = `${hh}:${mm}`;
+      document.getElementById("auditTime").value = now.toTimeString().slice(0,5);
     }
 
     function renderAuditSections() {
       const root = document.getElementById("auditSections");
       root.innerHTML = "";
-
       auditSections.forEach((group, gIndex) => {
         const block = document.createElement("div");
         block.className = "section-block";
         block.innerHTML = `<h4>${group.section} (${group.max} Marks)</h4>`;
-
         group.items.forEach((item, iIndex) => {
-          const qId = `q_${gIndex}_${iIndex}`;
-          const row = document.createElement("div");
-          row.className = "question";
-          row.innerHTML = `
+          const name = `q_${gIndex}_${iIndex}`;
+          const div = document.createElement("div");
+          div.className = "question";
+          div.innerHTML = `
             <div class="question-top">
               <div><strong>${item.parameter}</strong></div>
               <div class="marks">${item.marks} marks</div>
             </div>
             <div class="option-group">
-              <label><input type="radio" name="${qId}" value="${item.marks}" onchange="calculateScore()"> Yes</label>
-              <label><input type="radio" name="${qId}" value="0" onchange="calculateScore()"> No</label>
+              <label><input type="radio" name="${name}" value="${item.marks}" onchange="calculateScore()"> Yes</label>
+              <label><input type="radio" name="${name}" value="0" onchange="calculateScore()"> No</label>
             </div>
           `;
-          block.appendChild(row);
+          block.appendChild(div);
         });
-
         root.appendChild(block);
       });
     }
 
-    async function postData(payload) {
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      return await res.json();
+    async function parseResponse(res) {
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch(e) {
+        return { success:false, message:"Invalid API response", raw:text };
+      }
+    }
+
+    async function checkApi() {
+      const box = document.getElementById("apiMsg");
+      box.innerHTML = `<span class="warn">Checking API...</span>`;
+      try {
+        const res = await fetch(API_BASE + "?ping=1", { method:"GET" });
+        const data = await parseResponse(res);
+        if (res.ok) {
+          box.innerHTML = `<span class="ok">API reachable.</span>`;
+        } else {
+          box.innerHTML = `<span class="err">API returned error.</span>`;
+        }
+      } catch (e) {
+        box.innerHTML = `<span class="err">API not reachable. Check Apps Script deployment access and CORS behavior.</span>`;
+      }
     }
 
     async function login() {
@@ -448,11 +314,9 @@
       }
 
       try {
-        const data = await postData({
-          action: "login",
-          employeeId,
-          password
-        });
+        const url = `${API_BASE}?action=login&employeeId=${encodeURIComponent(employeeId)}&password=${encodeURIComponent(password)}`;
+        const res = await fetch(url, { method:"GET" });
+        const data = await parseResponse(res);
 
         if (data.success) {
           currentUser = data.user;
@@ -465,10 +329,10 @@
           setNow();
           renderAuditSections();
         } else {
-          msg.innerHTML = `<span class="err">${data.message || "Login failed."}</span>`;
+          msg.innerHTML = `<span class="err">${data.message || "Login failed. Check Apps Script doGet handling."}</span>`;
         }
       } catch (e) {
-        msg.innerHTML = `<span class="err">Unable to connect to server.</span>`;
+        msg.innerHTML = `<span class="err">Unable to connect to server. Please check Apps Script deployment permissions.</span>`;
       }
     }
 
@@ -483,8 +347,6 @@
       document.getElementById("loginCard").classList.remove("hidden");
       document.getElementById("appCard").classList.add("hidden");
       document.getElementById("password").value = "";
-      document.getElementById("loginMsg").innerHTML = "";
-      document.getElementById("submitMsg").innerHTML = "";
     }
 
     function fillStoreDropdown() {
@@ -507,19 +369,19 @@
       currentDistance = "";
       document.getElementById("gpsMsg").innerHTML = "";
 
-      const safe = (v) => v || "";
-      document.getElementById("dspCode").value = safe(currentStore?.DSPCode);
-      document.getElementById("storeName").value = safe(currentStore?.StoreName);
-      document.getElementById("dealerName").value = safe(currentStore?.DealerName);
-      document.getElementById("city").value = safe(currentStore?.City);
-      document.getElementById("pincode").value = safe(currentStore?.Pincode);
-      document.getElementById("state").value = safe(currentStore?.State);
-      document.getElementById("region").value = safe(currentStore?.Region);
-      document.getElementById("isdName").value = safe(currentStore?.ISDName);
-      document.getElementById("asmName").value = safe(currentStore?.ASMName);
-      document.getElementById("contactNumber").value = safe(currentStore?.ContactNumber);
-      document.getElementById("storeType").value = safe(currentStore?.StoreType);
-      document.getElementById("assignedEmployeeId").value = safe(currentStore?.AssignedEmployeeID);
+      const setVal = (id, val) => document.getElementById(id).value = val || "";
+      setVal("dspCode", currentStore?.DSPCode);
+      setVal("storeName", currentStore?.StoreName);
+      setVal("dealerName", currentStore?.DealerName);
+      setVal("city", currentStore?.City);
+      setVal("pincode", currentStore?.Pincode);
+      setVal("state", currentStore?.State);
+      setVal("region", currentStore?.Region);
+      setVal("isdName", currentStore?.ISDName);
+      setVal("asmName", currentStore?.ASMName);
+      setVal("contactNumber", currentStore?.ContactNumber);
+      setVal("storeType", currentStore?.StoreType);
+      setVal("assignedEmployeeId", currentStore?.AssignedEmployeeID);
     }
 
     function toRad(v) {
@@ -543,64 +405,49 @@
         msg.innerHTML = `<span class="err">Please select a DSP store first.</span>`;
         return;
       }
-
       if (!navigator.geolocation) {
-        msg.innerHTML = `<span class="err">Geolocation is not supported on this device.</span>`;
+        msg.innerHTML = `<span class="err">Geolocation not supported.</span>`;
         return;
       }
-
       msg.innerHTML = `<span class="warn">Capturing location...</span>`;
-
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        pos => {
           currentLat = pos.coords.latitude;
           currentLng = pos.coords.longitude;
-
           const storeLat = Number(currentStore.Latitude);
           const storeLng = Number(currentStore.Longitude);
-
-          currentDistance = calcDistanceMeters(
-            Number(currentLat),
-            Number(currentLng),
-            storeLat,
-            storeLng
-          ).toFixed(2);
+          currentDistance = calcDistanceMeters(currentLat, currentLng, storeLat, storeLng).toFixed(2);
 
           if (Number(currentDistance) <= 100) {
             gpsValidated = true;
-            msg.innerHTML = `<span class="ok">GPS verified successfully. Distance: ${currentDistance} meters.</span>`;
+            msg.innerHTML = `<span class="ok">GPS verified. Distance: ${currentDistance} meters.</span>`;
           } else {
             gpsValidated = false;
-            msg.innerHTML = `<span class="err">You are ${currentDistance} meters away from DSP location. Please visit store to start audit.</span>`;
+            msg.innerHTML = `<span class="err">You are ${currentDistance} meters away. Please visit the store.</span>`;
           }
         },
-        () => {
+        err => {
           gpsValidated = false;
-          msg.innerHTML = `<span class="err">Unable to capture GPS location.</span>`;
+          msg.innerHTML = `<span class="err">Unable to capture location.</span>`;
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
       );
     }
 
     function calculateScore() {
       let total = 0;
-
       auditSections.forEach((group, gIndex) => {
         group.items.forEach((item, iIndex) => {
           const radios = document.getElementsByName(`q_${gIndex}_${iIndex}`);
-          radios.forEach(r => {
-            if (r.checked) total += Number(r.value);
-          });
+          radios.forEach(r => { if (r.checked) total += Number(r.value); });
         });
       });
 
       document.getElementById("totalScore").textContent = total;
-
       let status = "Needs Improvement";
       if (total >= 90) status = "Excellent";
       else if (total >= 80) status = "Good";
       else if (total >= 70) status = "Average";
-
       document.getElementById("auditStatus").textContent = total === 0 ? "Pending" : status;
     }
 
@@ -610,26 +457,19 @@
 
       auditSections.forEach((group, gIndex) => {
         let secScore = 0;
-
         group.items.forEach((item, iIndex) => {
           const radios = document.getElementsByName(`q_${gIndex}_${iIndex}`);
-          let selected = null;
-
-          radios.forEach(r => {
-            if (r.checked) selected = Number(r.value);
-          });
-
+          let selected = "";
+          radios.forEach(r => { if (r.checked) selected = Number(r.value); });
           secScore += selected || 0;
-
           answers.push({
             section: group.section,
             parameter: item.parameter,
             marks: item.marks,
-            value: selected !== null ? selected : "",
+            value: selected,
             compliant: selected > 0 ? 1 : 0
           });
         });
-
         sectionScores[group.section] = secScore;
       });
 
@@ -640,69 +480,58 @@
       const submitMsg = document.getElementById("submitMsg");
       submitMsg.innerHTML = "";
 
-      if (!currentUser) {
-        submitMsg.innerHTML = `<span class="err">Please login first.</span>`;
-        return;
-      }
-
-      if (!currentStore) {
-        submitMsg.innerHTML = `<span class="err">Please select a DSP store.</span>`;
-        return;
-      }
-
-      if (!gpsValidated) {
-        submitMsg.innerHTML = `<span class="err">GPS validation is mandatory within 100 meters.</span>`;
-        return;
-      }
+      if (!currentUser) return submitMsg.innerHTML = `<span class="err">Please login first.</span>`;
+      if (!currentStore) return submitMsg.innerHTML = `<span class="err">Please select a DSP store.</span>`;
+      if (!gpsValidated) return submitMsg.innerHTML = `<span class="err">GPS validation within 100 meters is mandatory.</span>`;
 
       const frontPhoto = document.getElementById("frontPhoto").files[0];
       const selfiePhoto = document.getElementById("selfiePhoto").files[0];
-
       if (!frontPhoto || !selfiePhoto) {
         submitMsg.innerHTML = `<span class="err">Store front photo and merchandiser selfie are mandatory.</span>`;
         return;
       }
 
       const { answers, sectionScores } = buildAnswers();
-
       const unanswered = answers.filter(a => a.value === "");
       if (unanswered.length > 0) {
-        submitMsg.innerHTML = `<span class="err">Please answer all audit questions before submitting.</span>`;
+        submitMsg.innerHTML = `<span class="err">Please answer all audit questions.</span>`;
         return;
       }
 
-      const totalScore = Number(document.getElementById("totalScore").textContent || 0);
-      const status = document.getElementById("auditStatus").textContent;
-      const overallRemarks = document.getElementById("overallRemarks").value.trim();
-
-      const payload = {
-        action: "submitAudit",
-        employeeId: currentUser.EmployeeID,
-        dspCode: currentStore.DSPCode,
-        auditDate: document.getElementById("auditDate").value,
-        auditTime: document.getElementById("auditTime").value,
-        lat: currentLat,
-        lng: currentLng,
-        distance: currentDistance,
-        sectionScoresJSON: JSON.stringify(sectionScores),
-        totalScore,
-        status,
-        overallRemarks,
-        frontPhotoURL: frontPhoto.name,
-        selfieURL: selfiePhoto.name,
-        answers
-      };
+      const body = new URLSearchParams();
+      body.append("action", "submitAudit");
+      body.append("employeeId", currentUser.EmployeeID || "");
+      body.append("dspCode", currentStore.DSPCode || "");
+      body.append("auditDate", document.getElementById("auditDate").value);
+      body.append("auditTime", document.getElementById("auditTime").value);
+      body.append("lat", currentLat);
+      body.append("lng", currentLng);
+      body.append("distance", currentDistance);
+      body.append("sectionScoresJSON", JSON.stringify(sectionScores));
+      body.append("totalScore", document.getElementById("totalScore").textContent);
+      body.append("status", document.getElementById("auditStatus").textContent);
+      body.append("overallRemarks", document.getElementById("overallRemarks").value.trim());
+      body.append("frontPhotoURL", frontPhoto.name);
+      body.append("selfieURL", selfiePhoto.name);
+      body.append("answers", JSON.stringify(answers));
 
       try {
-        const result = await postData(payload);
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+          body: body.toString()
+        });
+
+        const result = await parseResponse(res);
+
         if (result.success) {
-          submitMsg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${result.auditId || ""}${result.actionPlan ? " | Action Plan: " + result.actionPlan : ""}</span>`;
+          submitMsg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${result.auditId || ""}</span>`;
           resetAuditForm();
         } else {
-          submitMsg.innerHTML = `<span class="err">${result.message || "Submission failed."}</span>`;
+          submitMsg.innerHTML = `<span class="err">${result.message || "Submission failed. Check Apps Script doPost logic."}</span>`;
         }
       } catch (e) {
-        submitMsg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
+        submitMsg.innerHTML = `<span class="err">Unable to submit audit. This usually means Apps Script deployment or CORS issue.</span>`;
       }
     }
 
@@ -717,6 +546,8 @@
       document.getElementById("auditStatus").textContent = "Pending";
       setNow();
     }
+
+    setNow();
   </script>
 </body>
 </html>
