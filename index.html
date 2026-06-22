@@ -58,6 +58,7 @@
     .upload-status{font-size:12px;margin-top:4px}
     .row-actions{display:flex;gap:12px;flex-wrap:wrap}
     .row-actions button{max-width:240px}
+    .search-input{margin-top:8px}
     @media (max-width:640px){
       .question-top{flex-direction:column}
     }
@@ -68,7 +69,7 @@
     <div class="topbar">
       <div>
         <h1>Daikin DSP Audit App</h1>
-        <div class="small">Single-row DSP audit capture with photo upload and scoring grid</div>
+        <div class="small">Region → Branch → DSP audit flow with single-row submission</div>
       </div>
       <div class="pill">Default Password: Daikin@123</div>
     </div>
@@ -95,8 +96,8 @@
       <div class="card">
         <div class="topbar">
           <div>
-            <h2>Start new audit</h2>
-            <div class="small">Location is captured only for future reference</div>
+            <h2>Start New Audit</h2>
+            <div class="small">Select Region, then Branch, then DSP</div>
           </div>
           <button style="max-width:160px;" onclick="logout()">Logout</button>
         </div>
@@ -111,14 +112,6 @@
             <input id="role" readonly>
           </div>
           <div>
-            <label>Region</label>
-            <input id="userRegion" readonly>
-          </div>
-          <div>
-            <label>Branch</label>
-            <input id="userBranch" readonly>
-          </div>
-          <div>
             <label>Audit Date</label>
             <input id="auditDate" type="date">
           </div>
@@ -130,24 +123,39 @@
 
         <div class="grid" style="margin-top:14px;">
           <div>
-            <label>Select DSP Store</label>
-            <select id="dspSelect" onchange="loadStoreDetails()">
-              <option value="">Select Store</option>
+            <label>Select Region</label>
+            <select id="regionSelect" onchange="onRegionChange()">
+              <option value="">Select Region</option>
             </select>
           </div>
           <div>
-            <label>&nbsp;</label>
-            <button onclick="captureLocation()">Capture latitude / longitude</button>
+            <label>Select Branch</label>
+            <select id="branchSelect" onchange="onBranchChange()">
+              <option value="">Select Branch</option>
+            </select>
           </div>
+          <div>
+            <label>Search DSP</label>
+            <input id="dspSearch" class="search-input" type="text" placeholder="Type DSP Code / Name / Dealer" oninput="filterDSPs()">
+          </div>
+          <div>
+            <label>Select DSP Store</label>
+            <select id="dspSelect" onchange="loadStoreDetails()">
+              <option value="">Select DSP</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;max-width:280px;">
+          <label>&nbsp;</label>
+          <button onclick="captureLocation()">Capture Latitude / Longitude</button>
         </div>
         <div id="gpsMsg" class="msg"></div>
       </div>
 
       <div class="card">
-        <h3>Store details</h3>
+        <h3>Store Details</h3>
         <div class="grid">
-          <div><label>Region</label><input id="region" readonly></div>
-          <div><label>Branch</label><input id="branch" readonly></div>
           <div><label>DSP Code</label><input id="dspCode" readonly></div>
           <div><label>DSP Name</label><input id="dspName" readonly></div>
           <div><label>Dealer Name</label><input id="dealerName" readonly></div>
@@ -161,7 +169,7 @@
       </div>
 
       <div class="card">
-        <h3>Photo capture</h3>
+        <h3>Photo Capture</h3>
         <div class="small">Mandatory: 1 shopfront photo + at least 1 store photo. Maximum 5 store photos.</div>
 
         <div class="grid" style="margin-top:12px;">
@@ -186,12 +194,12 @@
       </div>
 
       <div class="card">
-        <h3>Audit checklist</h3>
+        <h3>Audit Checklist</h3>
         <div id="auditSections"></div>
 
         <div class="score-grid">
           <div class="score-card">
-            <div class="label">Final score</div>
+            <div class="label">Final Score</div>
             <div class="value" id="finalScore">0.00</div>
           </div>
           <div class="score-card">
@@ -218,10 +226,12 @@
   </div>
 
   <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbwWS27on9EcsecAUvzRmqanE1BsaR80G3oIUk_uWIjXiLy2CoRRu-030Bm4ICxo7cq0fg/exec";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbxkf-WpXtVOMcqkwme8MTq8SCIuXAsm7v_JIOlwGq4tIegs5jj2WTsqcVxD7hjujrY_RQ/exec";
 
     let currentUser = null;
     let mappedStores = [];
+    let branchStores = [];
+    let filteredStores = [];
     let currentStore = null;
     let criteriaList = [];
 
@@ -272,20 +282,18 @@
         const data = await parseResponse(res);
 
         if (!data.success) {
-          msg.innerHTML = `<span class="err">${data.message || "Login failed."}</span>`;
+          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Login failed.")}</span>`;
           return;
         }
 
-        currentUser = data.user;
+        currentUser = data.user || {};
         mappedStores = data.stores || [];
         criteriaList = data.criteria || [];
 
         document.getElementById("employeeName").value = currentUser.EmployeeName || "";
         document.getElementById("role").value = currentUser.Role || "";
-        document.getElementById("userRegion").value = currentUser.Region || "";
-        document.getElementById("userBranch").value = currentUser.Branch || "";
 
-        fillStoreDropdown();
+        populateRegions();
         renderCriteria();
         setNow();
 
@@ -299,11 +307,15 @@
     function logout() {
       currentUser = null;
       mappedStores = [];
+      branchStores = [];
+      filteredStores = [];
       currentStore = null;
       criteriaList = [];
+
       capturedLatitude = "";
       capturedLongitude = "";
       locationCapturedAt = "";
+
       shopfrontFile = null;
       storeFiles = [];
       uploadedPhotoUrls = {
@@ -321,26 +333,89 @@
       document.getElementById("submitMsg").innerHTML = "";
       document.getElementById("uploadMsg").innerHTML = "";
       document.getElementById("photoPreviewGrid").innerHTML = "";
+      document.getElementById("gpsMsg").innerHTML = "";
+      document.getElementById("employeeId").value = "";
     }
 
-    function fillStoreDropdown() {
-      const select = document.getElementById("dspSelect");
-      select.innerHTML = `<option value="">Select Store</option>`;
-      mappedStores.forEach((store, idx) => {
-        const option = document.createElement("option");
-        option.value = idx;
-        option.textContent = `${store.DSPCode} - ${store.DSPName}`;
-        select.appendChild(option);
+    function populateRegions() {
+      const regions = [...new Set(mappedStores.map(s => (s.Region || "").trim()).filter(Boolean))].sort();
+      const sel = document.getElementById("regionSelect");
+      sel.innerHTML = `<option value="">Select Region</option>`;
+      regions.forEach(r => {
+        sel.innerHTML += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`;
+      });
+
+      document.getElementById("branchSelect").innerHTML = `<option value="">Select Branch</option>`;
+      document.getElementById("dspSelect").innerHTML = `<option value="">Select DSP</option>`;
+      document.getElementById("dspSearch").value = "";
+    }
+
+    function onRegionChange() {
+      const region = document.getElementById("regionSelect").value;
+      const branches = [...new Set(
+        mappedStores
+          .filter(s => (s.Region || "").trim() === region)
+          .map(s => (s.Branch || "").trim())
+          .filter(Boolean)
+      )].sort();
+
+      const branchSel = document.getElementById("branchSelect");
+      branchSel.innerHTML = `<option value="">Select Branch</option>`;
+      branches.forEach(b => {
+        branchSel.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
+      });
+
+      document.getElementById("dspSelect").innerHTML = `<option value="">Select DSP</option>`;
+      document.getElementById("dspSearch").value = "";
+      branchStores = [];
+      filteredStores = [];
+      clearStoreDetails();
+    }
+
+    function onBranchChange() {
+      const region = document.getElementById("regionSelect").value;
+      const branch = document.getElementById("branchSelect").value;
+
+      branchStores = mappedStores.filter(s =>
+        (s.Region || "").trim() === region &&
+        (s.Branch || "").trim() === branch
+      );
+
+      filteredStores = [...branchStores];
+      populateDSPDropdown(filteredStores);
+      clearStoreDetails();
+    }
+
+    function filterDSPs() {
+      const keyword = document.getElementById("dspSearch").value.trim().toLowerCase();
+
+      if (!keyword) {
+        filteredStores = [...branchStores];
+      } else {
+        filteredStores = branchStores.filter(s => {
+          const code = (s.DSPCode || "").toLowerCase();
+          const name = (s.DSPName || "").toLowerCase();
+          const dealer = (s.DealerName || "").toLowerCase();
+          return code.includes(keyword) || name.includes(keyword) || dealer.includes(keyword);
+        });
+      }
+
+      populateDSPDropdown(filteredStores);
+    }
+
+    function populateDSPDropdown(stores) {
+      const sel = document.getElementById("dspSelect");
+      sel.innerHTML = `<option value="">Select DSP</option>`;
+      stores.forEach((store, idx) => {
+        sel.innerHTML += `<option value="${idx}">${escapeHtml(store.DSPCode)} - ${escapeHtml(store.DSPName)}</option>`;
       });
     }
 
     function loadStoreDetails() {
-      const index = document.getElementById("dspSelect").value;
-      currentStore = mappedStores[index] || null;
+      const idx = document.getElementById("dspSelect").value;
+      currentStore = filteredStores[idx] || null;
       const setVal = (id, val) => document.getElementById(id).value = val || "";
 
-      setVal("region", currentStore?.Region);
-      setVal("branch", currentStore?.Branch);
       setVal("dspCode", currentStore?.DSPCode);
       setVal("dspName", currentStore?.DSPName);
       setVal("dealerName", currentStore?.DealerName);
@@ -350,6 +425,12 @@
       setVal("state", currentStore?.State);
       setVal("isdDeployment", currentStore?.ISDDeployment);
       setVal("asmName", currentStore?.ASMName);
+    }
+
+    function clearStoreDetails() {
+      currentStore = null;
+      ["dspCode","dspName","dealerName","ownerNumber","city","pincode","state","isdDeployment","asmName"]
+        .forEach(id => document.getElementById(id).value = "");
     }
 
     function captureLocation() {
@@ -389,7 +470,7 @@
       Object.keys(grouped).forEach(section => {
         const block = document.createElement("div");
         block.className = "section-block";
-        block.innerHTML = `<h4>${section}</h4>`;
+        block.innerHTML = `<h4>${escapeHtml(section)}</h4>`;
 
         grouped[section].forEach((c, idx) => {
           const uid = `crit_${idx}_${c.CriteriaID}`;
@@ -420,11 +501,10 @@
                 <strong>${escapeHtml(c.ParameterName)}</strong><br>
                 <span class="small">Weightage: ${c.Weightage}</span>
               </div>
-              <div class="marks">Points: 10 / 6 / 3</div>
+              <div class="marks">Scoring Enabled</div>
             </div>
             <div class="option-group">${optionsHtml}</div>
           `;
-
           block.appendChild(q);
         });
 
@@ -495,9 +575,11 @@
       } else {
         storeFiles = files;
       }
+
       document.getElementById("storePhotosMsg").innerHTML = storeFiles.length
         ? `<span class="ok">${storeFiles.length} store photo(s) selected.</span>`
         : "";
+
       renderPhotoPreviews();
     }
 
@@ -549,14 +631,12 @@
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
 
             const dataUrl = canvas.toDataURL("image/jpeg", quality);
-            const base64Data = dataUrl.split(",")[1];
             resolve({
-              base64Data,
+              base64Data: dataUrl.split(",")[1],
               mimeType: "image/jpeg",
               fileName: file.name.replace(/\.[^/.]+$/, "") + ".jpg"
             });
@@ -584,9 +664,7 @@
       });
 
       const data = await parseResponse(res);
-      if (!data.success) {
-        throw new Error(data.message || `${fileLabel} upload failed`);
-      }
+      if (!data.success) throw new Error(data.message || `${fileLabel} upload failed`);
       return data.fileUrl;
     }
 
@@ -644,13 +722,13 @@
       const btn = document.getElementById("submitAuditBtn");
       box.innerHTML = "";
 
-      if (!currentUser) {
+      if (!currentUser || !currentUser.EmployeeID) {
         box.innerHTML = `<span class="err">Please login first.</span>`;
         return;
       }
 
       if (!currentStore) {
-        box.innerHTML = `<span class="err">Please select a DSP store.</span>`;
+        box.innerHTML = `<span class="err">Please select DSP store.</span>`;
         return;
       }
 
@@ -742,8 +820,12 @@
     }
 
     function resetAuditForm() {
-      document.getElementById("dspSelect").value = "";
-      loadStoreDetails();
+      document.getElementById("regionSelect").value = "";
+      document.getElementById("branchSelect").innerHTML = `<option value="">Select Branch</option>`;
+      document.getElementById("dspSelect").innerHTML = `<option value="">Select DSP</option>`;
+      document.getElementById("dspSearch").value = "";
+      clearStoreDetails();
+
       document.getElementById("shopfrontPhoto").value = "";
       document.getElementById("storePhotos").value = "";
       document.getElementById("shopfrontMsg").innerHTML = "";
@@ -755,6 +837,8 @@
 
       shopfrontFile = null;
       storeFiles = [];
+      branchStores = [];
+      filteredStores = [];
       uploadedPhotoUrls = {
         shopfrontPhotoURL: "",
         storePhoto1URL: "",
