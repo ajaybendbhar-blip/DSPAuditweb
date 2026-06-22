@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSP Audit App</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f7fb; margin:0; padding:20px; }
+    .wrap { max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.08); }
+    h1,h2 { margin-top:0; color:#003b7a; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+    label { display:block; font-size:14px; margin-bottom:6px; font-weight:bold; }
+    input, select, button, textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
+    button { background:#0070d2; color:#fff; border:none; cursor:pointer; }
+    button:hover { background:#005fb2; }
+    .section { margin-top:20px; padding:16px; border:1px solid #e5e5e5; border-radius:10px; }
+    .hidden { display:none; }
+    .readonly { background:#f2f2f2; }
+    .scorebox { background:#eef7ff; padding:12px; border-radius:8px; margin-top:15px; }
+    .param { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:8px 0; }
+    .param input[type="checkbox"] { width:auto; transform:scale(1.2); }
+    .small { font-size:12px; color:#666; }
+    .ok { color:green; font-weight:bold; }
+    .err { color:red; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Daikin DSP Audit</h1>
+
+    <div id="loginBox">
+      <h2>Login</h2>
+      <div class="grid">
+        <div>
+          <label>Employee ID</label>
+          <input type="text" id="employeeId" placeholder="DAI12345">
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" id="password" placeholder="********">
+        </div>
+      </div>
+      <br>
+      <button onclick="login()">Login</button>
+      <p id="loginMsg"></p>
+    </div>
+
+    <div id="auditBox" class="hidden">
+      <h2>New Audit</h2>
+      <div class="grid">
+        <div>
+          <label>Select DSP</label>
+          <select id="dspSelect" onchange="loadStoreDetails()"></select>
+        </div>
+        <div>
+          <label>Audit Date</label>
+          <input type="date" id="auditDate">
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Store Details</h3>
+        <div class="grid">
+          <div><label>DSP Code</label><input id="dspCode" class="readonly" readonly></div>
+          <div><label>Store Name</label><input id="storeName" class="readonly" readonly></div>
+          <div><label>Dealer Name</label><input id="dealerName" class="readonly" readonly></div>
+          <div><label>City</label><input id="city" class="readonly" readonly></div>
+          <div><label>State</label><input id="state" class="readonly" readonly></div>
+          <div><label>Region</label><input id="region" class="readonly" readonly></div>
+          <div><label>ASM Name</label><input id="asmName" class="readonly" readonly></div>
+          <div><label>Contact Number</label><input id="contactNumber" class="readonly" readonly></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Geo Verification</h3>
+        <button onclick="captureLocation()">Capture GPS</button>
+        <p id="gpsMsg" class="small"></p>
+      </div>
+
+      <div class="section">
+        <h3>Mandatory Photos</h3>
+        <div class="grid">
+          <div>
+            <label>Store Front Photo</label>
+            <input type="file" id="frontPhoto" accept="image/*" capture="environment">
+          </div>
+          <div>
+            <label>Merchandiser Selfie</label>
+            <input type="file" id="selfiePhoto" accept="image/*" capture="user">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Audit Checklist</h3>
+        <div id="questionContainer"></div>
+      </div>
+
+      <div class="scorebox">
+        <div><strong>Total Score:</strong> <span id="totalScore">0</span> / 100</div>
+        <div><strong>Status:</strong> <span id="auditStatus">Pending</span></div>
+      </div>
+
+      <br>
+      <button onclick="submitAudit()">Submit Audit</button>
+      <p id="submitMsg"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "YOUR_APPS_SCRIPT_WEBAPP_URL";
+    let currentUser = null;
+    let mappedStores = [];
+    let currentStore = null;
+    let currentLat = "";
+    let currentLng = "";
+    let currentDistance = "";
+    const questions = [
+      { section:"Product Display", parameter:"RAC Display", marks:5 },
+      { section:"Product Display", parameter:"Cassette Display", marks:5 },
+      { section:"Product Display", parameter:"VRV Display", marks:5 },
+      { section:"Product Display", parameter:"Deep Freezer Display", marks:5 },
+      { section:"Product Display", parameter:"Tower Display", marks:5 },
+      { section:"Branding Visibility", parameter:"Glow Sign Board", marks:10 },
+      { section:"Branding Visibility", parameter:"Internal Branding", marks:5 },
+      { section:"Branding Visibility", parameter:"Catalogues", marks:5 },
+      { section:"POSM Availability", parameter:"Leaflets", marks:3 },
+      { section:"POSM Availability", parameter:"Brochure", marks:3 },
+      { section:"POSM Availability", parameter:"Exchange Offer Sticker", marks:3 },
+      { section:"POSM Availability", parameter:"Finance Poster", marks:3 },
+      { section:"POSM Availability", parameter:"New Product Poster", marks:3 },
+      { section:"Staff Compliance", parameter:"Uniform", marks:5 },
+      { section:"Staff Compliance", parameter:"ID Card", marks:5 },
+      { section:"Staff Compliance", parameter:"Product Knowledge", marks:5 },
+      { section:"Finance Activation", parameter:"Bajaj Finance", marks:3 },
+      { section:"Finance Activation", parameter:"HDFC Finance", marks:3 },
+      { section:"Finance Activation", parameter:"Exchange Offer", marks:2 },
+      { section:"Finance Activation", parameter:"Cashback Offer", marks:2 },
+      { section:"Store Hygiene", parameter:"Clean Floor", marks:5 },
+      { section:"Store Hygiene", parameter:"AC Dust Free", marks:5 },
+      { section:"Store Hygiene", parameter:"Lighting", marks:5 }
+    ];
+
+    function renderQuestions() {
+      const box = document.getElementById("questionContainer");
+      let html = "";
+      let currentSection = "";
+      questions.forEach((q, i) => {
+        if (q.section !== currentSection) {
+          currentSection = q.section;
+          html += `<h4>${currentSection}</h4>`;
+        }
+        html += `
+          <div class="param">
+            <div>${q.parameter} (${q.marks})</div>
+            <input type="checkbox" data-marks="${q.marks}" onchange="calculateScore()">
+          </div>
+        `;
+      });
+      box.innerHTML = html;
+    }
+
+    async function login() {
+      const employeeId = document.getElementById("employeeId").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        body: JSON.stringify({ action:"login", employeeId, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        currentUser = data.user;
+        mappedStores = data.stores || [];
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("auditBox").classList.remove("hidden");
+        document.getElementById("auditDate").value = new Date().toISOString().split("T")[0];
+        loadStoreDropdown();
+        renderQuestions();
+      } else {
+        document.getElementById("loginMsg").innerHTML = `<span class="err">${data.message}</span>`;
+      }
+    }
+
+    function loadStoreDropdown() {
+      const sel = document.getElementById("dspSelect");
+      sel.innerHTML = `<option value="">Select DSP</option>`;
+      mappedStores.forEach((s, idx) => {
+        sel.innerHTML += `<option value="${idx}">${s.DSPCode} - ${s.StoreName}</option>`;
+      });
+    }
+
+    function loadStoreDetails() {
+      const idx = document.getElementById("dspSelect").value;
+      currentStore = mappedStores[idx];
+      if (!currentStore) return;
+      document.getElementById("dspCode").value = currentStore.DSPCode || "";
+      document.getElementById("storeName").value = currentStore.StoreName || "";
+      document.getElementById("dealerName").value = currentStore.DealerName || "";
+      document.getElementById("city").value = currentStore.City || "";
+      document.getElementById("state").value = currentStore.State || "";
+      document.getElementById("region").value = currentStore.Region || "";
+      document.getElementById("asmName").value = currentStore.ASMName || "";
+      document.getElementById("contactNumber").value = currentStore.ContactNumber || "";
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const dLat = (lat2-lat1) * Math.PI/180;
+      const dLon = (lon2-lon1) * Math.PI/180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function captureLocation() {
+      if (!currentStore) {
+        document.getElementById("gpsMsg").innerHTML = `<span class="err">Please select DSP first.</span>`;
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(pos => {
+        currentLat = pos.coords.latitude;
+        currentLng = pos.coords.longitude;
+        currentDistance = calculateDistance(
+          Number(currentLat),
+          Number(currentLng),
+          Number(currentStore.Latitude),
+          Number(currentStore.Longitude)
+        ).toFixed(2);
+
+        if (currentDistance <= 100) {
+          document.getElementById("gpsMsg").innerHTML = `<span class="ok">GPS verified. Distance: ${currentDistance} meters</span>`;
+        } else {
+          document.getElementById("gpsMsg").innerHTML = `<span class="err">You are ${currentDistance} meters away. Please visit store to start audit.</span>`;
+        }
+      }, () => {
+        document.getElementById("gpsMsg").innerHTML = `<span class="err">Unable to capture location.</span>`;
+      });
+    }
+
+    function calculateScore() {
+      const checks = document.querySelectorAll('#questionContainer input[type="checkbox"]');
+      let score = 0;
+      checks.forEach(c => { if (c.checked) score += Number(c.dataset.marks); });
+      document.getElementById("totalScore").textContent = score;
+      let status = "Needs Improvement";
+      if (score >= 90) status = "Excellent";
+      else if (score >= 80) status = "Good";
+      else if (score >= 70) status = "Average";
+      document.getElementById("auditStatus").textContent = status;
+    }
+
+    async function submitAudit() {
+      if (!currentStore) return alert("Select DSP");
+      if (!currentLat || !currentLng) return alert("Capture GPS");
+      const frontPhoto = document.getElementById("frontPhoto").files[0];
+      const selfiePhoto = document.getElementById("selfiePhoto").files[0];
+      if (!frontPhoto || !selfiePhoto) return alert("Front photo and selfie are mandatory");
+
+      const checks = document.querySelectorAll('#questionContainer input[type="checkbox"]');
+      const answers = [];
+      checks.forEach((c, i) => {
+        answers.push({
+          parameter: questions[i].parameter,
+          section: questions[i].section,
+          marks: Number(c.dataset.marks),
+          value: c.checked ? 1 : 0
+        });
+      });
+
+      const payload = {
+        action: "submitAudit",
+        employeeId: currentUser.EmployeeID,
+        dspCode: currentStore.DSPCode,
+        auditDate: document.getElementById("auditDate").value,
+        lat: currentLat,
+        lng: currentLng,
+        distance: currentDistance,
+        totalScore: document.getElementById("totalScore").textContent,
+        status: document.getElementById("auditStatus").textContent,
+        answers: answers
+      };
+
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      document.getElementById("submitMsg").innerHTML = data.success
+        ? `<span class="ok">${data.message}</span>`
+        : `<span class="err">${data.message}</span>`;
+    }
+  </script>
+</body>
+</html>
