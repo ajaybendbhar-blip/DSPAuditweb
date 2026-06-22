@@ -3,294 +3,719 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DSP Audit App</title>
+  <title>Daikin DSP Audit App</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fb; margin:0; padding:20px; }
-    .wrap { max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.08); }
-    h1,h2 { margin-top:0; color:#003b7a; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
-    label { display:block; font-size:14px; margin-bottom:6px; font-weight:bold; }
-    input, select, button, textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
-    button { background:#0070d2; color:#fff; border:none; cursor:pointer; }
-    button:hover { background:#005fb2; }
-    .section { margin-top:20px; padding:16px; border:1px solid #e5e5e5; border-radius:10px; }
-    .hidden { display:none; }
-    .readonly { background:#f2f2f2; }
-    .scorebox { background:#eef7ff; padding:12px; border-radius:8px; margin-top:15px; }
-    .param { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:8px 0; }
-    .param input[type="checkbox"] { width:auto; transform:scale(1.2); }
-    .small { font-size:12px; color:#666; }
-    .ok { color:green; font-weight:bold; }
-    .err { color:red; font-weight:bold; }
+    :root{
+      --primary:#005bac;
+      --primary-dark:#01427c;
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#dbe3ee;
+      --success:#128a45;
+      --danger:#c62828;
+      --warning:#d97706;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .container{
+      max-width:1100px;
+      margin:24px auto;
+      padding:16px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+      padding:20px;
+      margin-bottom:18px;
+      border:1px solid var(--border);
+    }
+    h1,h2,h3,h4{margin:0 0 12px}
+    h1{color:var(--primary)}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+    }
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    input, select, textarea, button{
+      width:100%;
+      padding:11px 12px;
+      border:1px solid #cfd8e3;
+      border-radius:10px;
+      font:inherit;
+    }
+    textarea{min-height:80px; resize:vertical}
+    input[readonly]{
+      background:#f7f9fc;
+    }
+    button{
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+    }
+    button:hover{background:var(--primary-dark)}
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .row > *{flex:1}
+    .hidden{display:none}
+    .msg{
+      margin-top:10px;
+      font-size:14px;
+      font-weight:700;
+    }
+    .ok{color:var(--success)}
+    .err{color:var(--danger)}
+    .warn{color:var(--warning)}
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:#eef4ff;
+      color:var(--primary);
+      margin-bottom:10px;
+    }
+    .section-block{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px;
+      margin-top:14px;
+    }
+    .question{
+      padding:10px 0;
+      border-bottom:1px dashed #e4e9f0;
+    }
+    .question:last-child{border-bottom:none}
+    .question-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .marks{
+      min-width:70px;
+      text-align:right;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .option-group{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      margin:8px 0;
+    }
+    .option-group label{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:500;
+      margin:0;
+    }
+    .option-group input{
+      width:auto;
+      padding:0;
+    }
+    .score-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .score-card{
+      background:#f8fbff;
+      border:1px solid #d9e8fb;
+      border-radius:12px;
+      padding:12px;
+    }
+    .score-card .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .score-card .value{
+      font-size:24px;
+      font-weight:800;
+      color:var(--primary);
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .footer-note{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      margin-top:10px;
+    }
+    @media (max-width:640px){
+      .question-top{flex-direction:column}
+      .marks{text-align:left}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Daikin DSP Audit</h1>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>Daikin DSP Audit App</h1>
+        <div class="small">Merchandiser audit application for DSP stores</div>
+      </div>
+      <div class="pill">Field Audit v1</div>
+    </div>
 
-    <div id="loginBox">
+    <div id="loginCard" class="card">
       <h2>Login</h2>
       <div class="grid">
         <div>
-          <label>Employee ID</label>
-          <input type="text" id="employeeId" placeholder="DAI12345">
+          <label for="employeeId">Employee ID</label>
+          <input id="employeeId" type="text" placeholder="DAI12345">
         </div>
         <div>
-          <label>Password</label>
-          <input type="password" id="password" placeholder="********">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Enter password">
         </div>
       </div>
-      <br>
-      <button onclick="login()">Login</button>
-      <p id="loginMsg"></p>
+      <div style="margin-top:14px;">
+        <button onclick="login()">Login</button>
+      </div>
+      <div id="loginMsg" class="msg"></div>
     </div>
 
-    <div id="auditBox" class="hidden">
-      <h2>New Audit</h2>
-      <div class="grid">
-        <div>
-          <label>Select DSP</label>
-          <select id="dspSelect" onchange="loadStoreDetails()"></select>
+    <div id="appCard" class="hidden">
+      <div class="card">
+        <div class="topbar">
+          <div>
+            <h2>Start New Audit</h2>
+            <div class="small">Mapped stores are loaded after login</div>
+          </div>
+          <button style="max-width:160px;" onclick="logout()">Logout</button>
         </div>
-        <div>
-          <label>Audit Date</label>
-          <input type="date" id="auditDate">
+
+        <div class="grid">
+          <div>
+            <label for="auditorName">Auditor Name</label>
+            <input id="auditorName" type="text" readonly>
+          </div>
+          <div>
+            <label for="auditorRole">Role</label>
+            <input id="auditorRole" type="text" readonly>
+          </div>
+          <div>
+            <label for="auditDate">Audit Date</label>
+            <input id="auditDate" type="date">
+          </div>
+          <div>
+            <label for="auditTime">Audit Time</label>
+            <input id="auditTime" type="time">
+          </div>
         </div>
+
+        <div class="grid" style="margin-top:14px;">
+          <div>
+            <label for="dspSelect">Select DSP Store</label>
+            <select id="dspSelect" onchange="loadStoreDetails()">
+              <option value="">Select Store</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button onclick="captureLocation()">Capture GPS Location</button>
+          </div>
+        </div>
+        <div id="gpsMsg" class="msg"></div>
       </div>
 
-      <div class="section">
+      <div class="card">
         <h3>Store Details</h3>
         <div class="grid">
-          <div><label>DSP Code</label><input id="dspCode" class="readonly" readonly></div>
-          <div><label>Store Name</label><input id="storeName" class="readonly" readonly></div>
-          <div><label>Dealer Name</label><input id="dealerName" class="readonly" readonly></div>
-          <div><label>City</label><input id="city" class="readonly" readonly></div>
-          <div><label>State</label><input id="state" class="readonly" readonly></div>
-          <div><label>Region</label><input id="region" class="readonly" readonly></div>
-          <div><label>ASM Name</label><input id="asmName" class="readonly" readonly></div>
-          <div><label>Contact Number</label><input id="contactNumber" class="readonly" readonly></div>
+          <div><label>DSP Code</label><input id="dspCode" readonly></div>
+          <div><label>Store Name</label><input id="storeName" readonly></div>
+          <div><label>Dealer Name</label><input id="dealerName" readonly></div>
+          <div><label>City</label><input id="city" readonly></div>
+          <div><label>Pincode</label><input id="pincode" readonly></div>
+          <div><label>State</label><input id="state" readonly></div>
+          <div><label>Region</label><input id="region" readonly></div>
+          <div><label>ISD Name</label><input id="isdName" readonly></div>
+          <div><label>ASM Name</label><input id="asmName" readonly></div>
+          <div><label>Contact Number</label><input id="contactNumber" readonly></div>
+          <div><label>Store Type</label><input id="storeType" readonly></div>
+          <div><label>Assigned Employee ID</label><input id="assignedEmployeeId" readonly></div>
         </div>
       </div>
 
-      <div class="section">
-        <h3>Geo Verification</h3>
-        <button onclick="captureLocation()">Capture GPS</button>
-        <p id="gpsMsg" class="small"></p>
-      </div>
-
-      <div class="section">
+      <div class="card">
         <h3>Mandatory Photos</h3>
         <div class="grid">
           <div>
-            <label>Store Front Photo</label>
-            <input type="file" id="frontPhoto" accept="image/*" capture="environment">
+            <label for="frontPhoto">Store Front Photo</label>
+            <input id="frontPhoto" type="file" accept="image/*" capture="environment">
           </div>
           <div>
-            <label>Merchandiser Selfie</label>
-            <input type="file" id="selfiePhoto" accept="image/*" capture="user">
+            <label for="selfiePhoto">Merchandiser Selfie</label>
+            <input id="selfiePhoto" type="file" accept="image/*" capture="user">
           </div>
         </div>
+        <div class="small" style="margin-top:8px;">Current backend saves audit data. Photo upload integration to Drive can be added in the next version.</div>
       </div>
 
-      <div class="section">
+      <div class="card">
         <h3>Audit Checklist</h3>
-        <div id="questionContainer"></div>
-      </div>
+        <div id="auditSections"></div>
 
-      <div class="scorebox">
-        <div><strong>Total Score:</strong> <span id="totalScore">0</span> / 100</div>
-        <div><strong>Status:</strong> <span id="auditStatus">Pending</span></div>
-      </div>
+        <div class="score-grid">
+          <div class="score-card">
+            <div class="label">Total Score</div>
+            <div class="value"><span id="totalScore">0</span>/100</div>
+          </div>
+          <div class="score-card">
+            <div class="label">Compliance Status</div>
+            <div class="value" id="auditStatus">Pending</div>
+          </div>
+        </div>
 
-      <br>
-      <button onclick="submitAudit()">Submit Audit</button>
-      <p id="submitMsg"></p>
+        <div style="margin-top:16px;">
+          <label for="overallRemarks">Overall Remarks</label>
+          <textarea id="overallRemarks" placeholder="Enter audit remarks"></textarea>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button onclick="submitAudit()">Submit Audit</button>
+        </div>
+        <div id="submitMsg" class="msg"></div>
+      </div>
     </div>
+
+    <div class="footer-note">Daikin DSP Audit Application</div>
   </div>
 
   <script>
-    const API_BASE = "YOUR_APPS_SCRIPT_WEBAPP_URL";
+    const API_BASE = "https://script.google.com/macros/s/AKfycbx2feRNowy8Hx_Fj1C99-fI4sFs0GXfqEK8ZwI0zI9J11GayWR5X4ir3dSfFl0k2aBR0g/exec";
+
     let currentUser = null;
     let mappedStores = [];
     let currentStore = null;
     let currentLat = "";
     let currentLng = "";
     let currentDistance = "";
-    const questions = [
-      { section:"Product Display", parameter:"RAC Display", marks:5 },
-      { section:"Product Display", parameter:"Cassette Display", marks:5 },
-      { section:"Product Display", parameter:"VRV Display", marks:5 },
-      { section:"Product Display", parameter:"Deep Freezer Display", marks:5 },
-      { section:"Product Display", parameter:"Tower Display", marks:5 },
-      { section:"Branding Visibility", parameter:"Glow Sign Board", marks:10 },
-      { section:"Branding Visibility", parameter:"Internal Branding", marks:5 },
-      { section:"Branding Visibility", parameter:"Catalogues", marks:5 },
-      { section:"POSM Availability", parameter:"Leaflets", marks:3 },
-      { section:"POSM Availability", parameter:"Brochure", marks:3 },
-      { section:"POSM Availability", parameter:"Exchange Offer Sticker", marks:3 },
-      { section:"POSM Availability", parameter:"Finance Poster", marks:3 },
-      { section:"POSM Availability", parameter:"New Product Poster", marks:3 },
-      { section:"Staff Compliance", parameter:"Uniform", marks:5 },
-      { section:"Staff Compliance", parameter:"ID Card", marks:5 },
-      { section:"Staff Compliance", parameter:"Product Knowledge", marks:5 },
-      { section:"Finance Activation", parameter:"Bajaj Finance", marks:3 },
-      { section:"Finance Activation", parameter:"HDFC Finance", marks:3 },
-      { section:"Finance Activation", parameter:"Exchange Offer", marks:2 },
-      { section:"Finance Activation", parameter:"Cashback Offer", marks:2 },
-      { section:"Store Hygiene", parameter:"Clean Floor", marks:5 },
-      { section:"Store Hygiene", parameter:"AC Dust Free", marks:5 },
-      { section:"Store Hygiene", parameter:"Lighting", marks:5 }
+    let gpsValidated = false;
+
+    const auditSections = [
+      {
+        section: "Product Display",
+        max: 25,
+        items: [
+          { parameter: "RAC Display", marks: 5 },
+          { parameter: "Cassette Display", marks: 5 },
+          { parameter: "VRV Display", marks: 5 },
+          { parameter: "Deep Freezer Display", marks: 5 },
+          { parameter: "Tower Display", marks: 5 }
+        ]
+      },
+      {
+        section: "Branding Visibility",
+        max: 20,
+        items: [
+          { parameter: "Glow Sign Board", marks: 10 },
+          { parameter: "Internal Branding", marks: 5 },
+          { parameter: "Catalogues", marks: 5 }
+        ]
+      },
+      {
+        section: "POSM Availability",
+        max: 15,
+        items: [
+          { parameter: "Leaflets", marks: 3 },
+          { parameter: "Brochure", marks: 3 },
+          { parameter: "Exchange Offer Sticker", marks: 3 },
+          { parameter: "Finance Poster", marks: 3 },
+          { parameter: "New Product Poster", marks: 3 }
+        ]
+      },
+      {
+        section: "Staff Compliance",
+        max: 15,
+        items: [
+          { parameter: "Uniform", marks: 5 },
+          { parameter: "ID Card", marks: 5 },
+          { parameter: "Product Knowledge", marks: 5 }
+        ]
+      },
+      {
+        section: "Finance Activation",
+        max: 10,
+        items: [
+          { parameter: "Bajaj Finance", marks: 3 },
+          { parameter: "HDFC Finance", marks: 3 },
+          { parameter: "Exchange Offer", marks: 2 },
+          { parameter: "Cashback Offer", marks: 2 }
+        ]
+      },
+      {
+        section: "Store Hygiene",
+        max: 15,
+        items: [
+          { parameter: "Clean Floor", marks: 5 },
+          { parameter: "AC Dust Free", marks: 5 },
+          { parameter: "Lighting", marks: 5 }
+        ]
+      }
     ];
 
-    function renderQuestions() {
-      const box = document.getElementById("questionContainer");
-      let html = "";
-      let currentSection = "";
-      questions.forEach((q, i) => {
-        if (q.section !== currentSection) {
-          currentSection = q.section;
-          html += `<h4>${currentSection}</h4>`;
-        }
-        html += `
-          <div class="param">
-            <div>${q.parameter} (${q.marks})</div>
-            <input type="checkbox" data-marks="${q.marks}" onchange="calculateScore()">
-          </div>
-        `;
+    function setNow() {
+      const now = new Date();
+      document.getElementById("auditDate").value = now.toISOString().split("T")[0];
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      document.getElementById("auditTime").value = `${hh}:${mm}`;
+    }
+
+    function renderAuditSections() {
+      const root = document.getElementById("auditSections");
+      root.innerHTML = "";
+
+      auditSections.forEach((group, gIndex) => {
+        const block = document.createElement("div");
+        block.className = "section-block";
+        block.innerHTML = `<h4>${group.section} (${group.max} Marks)</h4>`;
+
+        group.items.forEach((item, iIndex) => {
+          const qId = `q_${gIndex}_${iIndex}`;
+          const row = document.createElement("div");
+          row.className = "question";
+          row.innerHTML = `
+            <div class="question-top">
+              <div><strong>${item.parameter}</strong></div>
+              <div class="marks">${item.marks} marks</div>
+            </div>
+            <div class="option-group">
+              <label><input type="radio" name="${qId}" value="${item.marks}" onchange="calculateScore()"> Yes</label>
+              <label><input type="radio" name="${qId}" value="0" onchange="calculateScore()"> No</label>
+            </div>
+          `;
+          block.appendChild(row);
+        });
+
+        root.appendChild(block);
       });
-      box.innerHTML = html;
+    }
+
+    async function postData(payload) {
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
     }
 
     async function login() {
       const employeeId = document.getElementById("employeeId").value.trim();
       const password = document.getElementById("password").value.trim();
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        body: JSON.stringify({ action:"login", employeeId, password })
-      });
-      const data = await res.json();
-      if (data.success) {
-        currentUser = data.user;
-        mappedStores = data.stores || [];
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("auditBox").classList.remove("hidden");
-        document.getElementById("auditDate").value = new Date().toISOString().split("T")[0];
-        loadStoreDropdown();
-        renderQuestions();
-      } else {
-        document.getElementById("loginMsg").innerHTML = `<span class="err">${data.message}</span>`;
+      const msg = document.getElementById("loginMsg");
+      msg.innerHTML = "";
+
+      if (!employeeId || !password) {
+        msg.innerHTML = `<span class="err">Enter Employee ID and Password.</span>`;
+        return;
+      }
+
+      try {
+        const data = await postData({
+          action: "login",
+          employeeId,
+          password
+        });
+
+        if (data.success) {
+          currentUser = data.user;
+          mappedStores = data.stores || [];
+          document.getElementById("loginCard").classList.add("hidden");
+          document.getElementById("appCard").classList.remove("hidden");
+          document.getElementById("auditorName").value = currentUser.Name || "";
+          document.getElementById("auditorRole").value = currentUser.Role || "";
+          fillStoreDropdown();
+          setNow();
+          renderAuditSections();
+        } else {
+          msg.innerHTML = `<span class="err">${data.message || "Login failed."}</span>`;
+        }
+      } catch (e) {
+        msg.innerHTML = `<span class="err">Unable to connect to server.</span>`;
       }
     }
 
-    function loadStoreDropdown() {
-      const sel = document.getElementById("dspSelect");
-      sel.innerHTML = `<option value="">Select DSP</option>`;
-      mappedStores.forEach((s, idx) => {
-        sel.innerHTML += `<option value="${idx}">${s.DSPCode} - ${s.StoreName}</option>`;
+    function logout() {
+      currentUser = null;
+      mappedStores = [];
+      currentStore = null;
+      currentLat = "";
+      currentLng = "";
+      currentDistance = "";
+      gpsValidated = false;
+      document.getElementById("loginCard").classList.remove("hidden");
+      document.getElementById("appCard").classList.add("hidden");
+      document.getElementById("password").value = "";
+      document.getElementById("loginMsg").innerHTML = "";
+      document.getElementById("submitMsg").innerHTML = "";
+    }
+
+    function fillStoreDropdown() {
+      const select = document.getElementById("dspSelect");
+      select.innerHTML = `<option value="">Select Store</option>`;
+      mappedStores.forEach((store, idx) => {
+        const option = document.createElement("option");
+        option.value = idx;
+        option.textContent = `${store.DSPCode} - ${store.StoreName}, ${store.City}`;
+        select.appendChild(option);
       });
     }
 
     function loadStoreDetails() {
-      const idx = document.getElementById("dspSelect").value;
-      currentStore = mappedStores[idx];
-      if (!currentStore) return;
-      document.getElementById("dspCode").value = currentStore.DSPCode || "";
-      document.getElementById("storeName").value = currentStore.StoreName || "";
-      document.getElementById("dealerName").value = currentStore.DealerName || "";
-      document.getElementById("city").value = currentStore.City || "";
-      document.getElementById("state").value = currentStore.State || "";
-      document.getElementById("region").value = currentStore.Region || "";
-      document.getElementById("asmName").value = currentStore.ASMName || "";
-      document.getElementById("contactNumber").value = currentStore.ContactNumber || "";
+      const index = document.getElementById("dspSelect").value;
+      currentStore = mappedStores[index] || null;
+      gpsValidated = false;
+      currentLat = "";
+      currentLng = "";
+      currentDistance = "";
+      document.getElementById("gpsMsg").innerHTML = "";
+
+      const safe = (v) => v || "";
+      document.getElementById("dspCode").value = safe(currentStore?.DSPCode);
+      document.getElementById("storeName").value = safe(currentStore?.StoreName);
+      document.getElementById("dealerName").value = safe(currentStore?.DealerName);
+      document.getElementById("city").value = safe(currentStore?.City);
+      document.getElementById("pincode").value = safe(currentStore?.Pincode);
+      document.getElementById("state").value = safe(currentStore?.State);
+      document.getElementById("region").value = safe(currentStore?.Region);
+      document.getElementById("isdName").value = safe(currentStore?.ISDName);
+      document.getElementById("asmName").value = safe(currentStore?.ASMName);
+      document.getElementById("contactNumber").value = safe(currentStore?.ContactNumber);
+      document.getElementById("storeType").value = safe(currentStore?.StoreType);
+      document.getElementById("assignedEmployeeId").value = safe(currentStore?.AssignedEmployeeID);
     }
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
+    function toRad(v) {
+      return v * Math.PI / 180;
+    }
+
+    function calcDistanceMeters(lat1, lon1, lat2, lon2) {
       const R = 6371000;
-      const dLat = (lat2-lat1) * Math.PI/180;
-      const dLon = (lon2-lon1) * Math.PI/180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
 
     function captureLocation() {
+      const msg = document.getElementById("gpsMsg");
       if (!currentStore) {
-        document.getElementById("gpsMsg").innerHTML = `<span class="err">Please select DSP first.</span>`;
+        msg.innerHTML = `<span class="err">Please select a DSP store first.</span>`;
         return;
       }
-      navigator.geolocation.getCurrentPosition(pos => {
-        currentLat = pos.coords.latitude;
-        currentLng = pos.coords.longitude;
-        currentDistance = calculateDistance(
-          Number(currentLat),
-          Number(currentLng),
-          Number(currentStore.Latitude),
-          Number(currentStore.Longitude)
-        ).toFixed(2);
 
-        if (currentDistance <= 100) {
-          document.getElementById("gpsMsg").innerHTML = `<span class="ok">GPS verified. Distance: ${currentDistance} meters</span>`;
-        } else {
-          document.getElementById("gpsMsg").innerHTML = `<span class="err">You are ${currentDistance} meters away. Please visit store to start audit.</span>`;
-        }
-      }, () => {
-        document.getElementById("gpsMsg").innerHTML = `<span class="err">Unable to capture location.</span>`;
-      });
+      if (!navigator.geolocation) {
+        msg.innerHTML = `<span class="err">Geolocation is not supported on this device.</span>`;
+        return;
+      }
+
+      msg.innerHTML = `<span class="warn">Capturing location...</span>`;
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          currentLat = pos.coords.latitude;
+          currentLng = pos.coords.longitude;
+
+          const storeLat = Number(currentStore.Latitude);
+          const storeLng = Number(currentStore.Longitude);
+
+          currentDistance = calcDistanceMeters(
+            Number(currentLat),
+            Number(currentLng),
+            storeLat,
+            storeLng
+          ).toFixed(2);
+
+          if (Number(currentDistance) <= 100) {
+            gpsValidated = true;
+            msg.innerHTML = `<span class="ok">GPS verified successfully. Distance: ${currentDistance} meters.</span>`;
+          } else {
+            gpsValidated = false;
+            msg.innerHTML = `<span class="err">You are ${currentDistance} meters away from DSP location. Please visit store to start audit.</span>`;
+          }
+        },
+        () => {
+          gpsValidated = false;
+          msg.innerHTML = `<span class="err">Unable to capture GPS location.</span>`;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
     }
 
     function calculateScore() {
-      const checks = document.querySelectorAll('#questionContainer input[type="checkbox"]');
-      let score = 0;
-      checks.forEach(c => { if (c.checked) score += Number(c.dataset.marks); });
-      document.getElementById("totalScore").textContent = score;
+      let total = 0;
+
+      auditSections.forEach((group, gIndex) => {
+        group.items.forEach((item, iIndex) => {
+          const radios = document.getElementsByName(`q_${gIndex}_${iIndex}`);
+          radios.forEach(r => {
+            if (r.checked) total += Number(r.value);
+          });
+        });
+      });
+
+      document.getElementById("totalScore").textContent = total;
+
       let status = "Needs Improvement";
-      if (score >= 90) status = "Excellent";
-      else if (score >= 80) status = "Good";
-      else if (score >= 70) status = "Average";
-      document.getElementById("auditStatus").textContent = status;
+      if (total >= 90) status = "Excellent";
+      else if (total >= 80) status = "Good";
+      else if (total >= 70) status = "Average";
+
+      document.getElementById("auditStatus").textContent = total === 0 ? "Pending" : status;
+    }
+
+    function buildAnswers() {
+      const answers = [];
+      const sectionScores = {};
+
+      auditSections.forEach((group, gIndex) => {
+        let secScore = 0;
+
+        group.items.forEach((item, iIndex) => {
+          const radios = document.getElementsByName(`q_${gIndex}_${iIndex}`);
+          let selected = null;
+
+          radios.forEach(r => {
+            if (r.checked) selected = Number(r.value);
+          });
+
+          secScore += selected || 0;
+
+          answers.push({
+            section: group.section,
+            parameter: item.parameter,
+            marks: item.marks,
+            value: selected !== null ? selected : "",
+            compliant: selected > 0 ? 1 : 0
+          });
+        });
+
+        sectionScores[group.section] = secScore;
+      });
+
+      return { answers, sectionScores };
     }
 
     async function submitAudit() {
-      if (!currentStore) return alert("Select DSP");
-      if (!currentLat || !currentLng) return alert("Capture GPS");
+      const submitMsg = document.getElementById("submitMsg");
+      submitMsg.innerHTML = "";
+
+      if (!currentUser) {
+        submitMsg.innerHTML = `<span class="err">Please login first.</span>`;
+        return;
+      }
+
+      if (!currentStore) {
+        submitMsg.innerHTML = `<span class="err">Please select a DSP store.</span>`;
+        return;
+      }
+
+      if (!gpsValidated) {
+        submitMsg.innerHTML = `<span class="err">GPS validation is mandatory within 100 meters.</span>`;
+        return;
+      }
+
       const frontPhoto = document.getElementById("frontPhoto").files[0];
       const selfiePhoto = document.getElementById("selfiePhoto").files[0];
-      if (!frontPhoto || !selfiePhoto) return alert("Front photo and selfie are mandatory");
 
-      const checks = document.querySelectorAll('#questionContainer input[type="checkbox"]');
-      const answers = [];
-      checks.forEach((c, i) => {
-        answers.push({
-          parameter: questions[i].parameter,
-          section: questions[i].section,
-          marks: Number(c.dataset.marks),
-          value: c.checked ? 1 : 0
-        });
-      });
+      if (!frontPhoto || !selfiePhoto) {
+        submitMsg.innerHTML = `<span class="err">Store front photo and merchandiser selfie are mandatory.</span>`;
+        return;
+      }
+
+      const { answers, sectionScores } = buildAnswers();
+
+      const unanswered = answers.filter(a => a.value === "");
+      if (unanswered.length > 0) {
+        submitMsg.innerHTML = `<span class="err">Please answer all audit questions before submitting.</span>`;
+        return;
+      }
+
+      const totalScore = Number(document.getElementById("totalScore").textContent || 0);
+      const status = document.getElementById("auditStatus").textContent;
+      const overallRemarks = document.getElementById("overallRemarks").value.trim();
 
       const payload = {
         action: "submitAudit",
         employeeId: currentUser.EmployeeID,
         dspCode: currentStore.DSPCode,
         auditDate: document.getElementById("auditDate").value,
+        auditTime: document.getElementById("auditTime").value,
         lat: currentLat,
         lng: currentLng,
         distance: currentDistance,
-        totalScore: document.getElementById("totalScore").textContent,
-        status: document.getElementById("auditStatus").textContent,
-        answers: answers
+        sectionScoresJSON: JSON.stringify(sectionScores),
+        totalScore,
+        status,
+        overallRemarks,
+        frontPhotoURL: frontPhoto.name,
+        selfieURL: selfiePhoto.name,
+        answers
       };
 
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      document.getElementById("submitMsg").innerHTML = data.success
-        ? `<span class="ok">${data.message}</span>`
-        : `<span class="err">${data.message}</span>`;
+      try {
+        const result = await postData(payload);
+        if (result.success) {
+          submitMsg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${result.auditId || ""}${result.actionPlan ? " | Action Plan: " + result.actionPlan : ""}</span>`;
+          resetAuditForm();
+        } else {
+          submitMsg.innerHTML = `<span class="err">${result.message || "Submission failed."}</span>`;
+        }
+      } catch (e) {
+        submitMsg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
+      }
+    }
+
+    function resetAuditForm() {
+      document.getElementById("dspSelect").value = "";
+      loadStoreDetails();
+      document.getElementById("frontPhoto").value = "";
+      document.getElementById("selfiePhoto").value = "";
+      document.getElementById("overallRemarks").value = "";
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      document.getElementById("totalScore").textContent = "0";
+      document.getElementById("auditStatus").textContent = "Pending";
+      setNow();
     }
   </script>
 </body>
