@@ -29,15 +29,13 @@
     }
     .hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .hero h1{margin:0;font-size:28px}
-    .hero p{margin:8px 0 0;color:rgba(255,255,255,.9)}
-    .badge{background:rgba(255,255,255,.14);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
     .card{
       background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
       box-shadow:var(--shadow);padding:18px;margin:16px 0;
     }
     .section-title{margin:0 0 14px;font-size:20px;color:var(--brand)}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
     label{display:block;font-size:13px;font-weight:700;margin:0 0 6px}
     input,select,textarea,button{
       width:100%;padding:12px;border:1px solid #cdd8e5;border-radius:12px;font:inherit
@@ -74,7 +72,6 @@
     .options{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
     .options label{display:flex;align-items:center;gap:6px;margin:0;font-weight:500}
     .options input{width:auto;padding:0}
-    .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
     .photo-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff}
     .photo-card h4{margin:0 0 10px;font-size:15px}
     .photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -103,9 +100,7 @@
       <div class="hero-top">
         <div>
           <h1>Daikin DSP Audit</h1>
-          <p>Merchandiser retail compliance audit with image proof, checklist scoring, and mobile-first flow.</p>
         </div>
-        <div class="badge">Production UI Preview</div>
       </div>
     </div>
 
@@ -209,7 +204,7 @@
 
       <div class="card">
         <h2 class="section-title">Photo Evidence</h2>
-        <div class="small">Issue explanation: on some Android Chrome versions, camera may not appear in the normal image picker. So each slot below has both <strong>Take Photo</strong> and <strong>Upload</strong> buttons for reliability. [web:185][web:188]</div>
+        <div class="small">Shopfront photo is mandatory. For store photos, at least 1 out of 5 is mandatory.</div>
 
         <div class="photo-grid" style="margin-top:14px;">
           <div class="photo-card">
@@ -287,13 +282,13 @@
       </div>
 
       <div class="card">
-        <h2 class="section-title">Section-wise Score</h2>
-        <div id="sectionScoreCards" class="score-row"></div>
+        <h2 class="section-title">Audit Checklist</h2>
+        <div id="auditSections"></div>
       </div>
 
       <div class="card">
-        <h2 class="section-title">Audit Checklist</h2>
-        <div id="auditSections"></div>
+        <h2 class="section-title">Section-wise Score</h2>
+        <div id="sectionScoreCards" class="score-row"></div>
       </div>
 
       <div class="card">
