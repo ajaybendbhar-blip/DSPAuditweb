@@ -3,449 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daikin DSP Audit</title>
+  <title>DSP Audit WebApp</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#f3f6fb;
-      --surface:#ffffff;
-      --surface-2:#f7f9fc;
-      --line:#dce4ee;
-      --text:#17324d;
-      --muted:#62758b;
-      --primary:#0066cc;
-      --primary-2:#004f9e;
-      --success:#14804a;
-      --danger:#c53b32;
-      --shadow:0 10px 30px rgba(14,32,61,.08);
-      --radius:18px;
-    }
-    * { box-sizing:border-box; }
-    body {
-      margin:0;
-      font-family:'Inter', Arial, sans-serif;
-      background:linear-gradient(180deg,#edf4fb 0%, #f6f8fc 100%);
-      color:var(--text);
-    }
-    .app-shell {
-      max-width:1100px;
-      margin:0 auto;
-      padding:24px 16px 40px;
-    }
-    .hero {
-      background:linear-gradient(135deg,#0d5cab 0%, #0c7be0 100%);
-      color:#fff;
-      border-radius:24px;
-      padding:24px;
-      box-shadow:var(--shadow);
-      margin-bottom:20px;
-    }
-    .hero h1 {
-      margin:0;
-      font-size:32px;
-      line-height:1.1;
-      font-weight:800;
-    }
-    .card {
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .card + .card { margin-top:18px; }
-    .card-head {
-      padding:18px 20px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .card-head h2 { margin:0; font-size:20px; }
-    .card-head p { margin:4px 0 0; font-size:13px; color:var(--muted); }
-    .card-body { padding:20px; }
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(12,1fr);
-      gap:14px;
-    }
-    .field { grid-column:span 12; }
-    .field.col-6 { grid-column:span 6; }
-    .field.col-4 { grid-column:span 4; }
-    .field.col-3 { grid-column:span 3; }
-    label {
-      display:block;
-      font-size:13px;
-      font-weight:700;
-      color:var(--text);
-      margin-bottom:8px;
-    }
-    input, select, textarea, button {
-      font:inherit;
-    }
-    input, select, textarea {
-      width:100%;
-      border:1px solid #cfd9e6;
-      background:#fff;
-      border-radius:12px;
-      padding:12px 14px;
-      color:var(--text);
-      outline:none;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color:#7eb6f7;
-      box-shadow:0 0 0 4px rgba(0,102,204,.12);
-    }
-    textarea { min-height:88px; resize:vertical; }
-    .readonly { background:var(--surface-2); }
-    .btn-row { display:flex; gap:12px; flex-wrap:wrap; }
-    .btn {
-      border:none;
-      border-radius:12px;
-      padding:12px 18px;
-      font-weight:700;
-      cursor:pointer;
-      min-height:46px;
-      transition:.2s ease;
-    }
-    .btn-primary { background:var(--primary); color:#fff; }
-    .btn-primary:hover { background:var(--primary-2); }
-    .btn-secondary { background:#eef4fb; color:var(--primary-2); }
-    .btn-secondary:hover { background:#e3edf8; }
-    .status-pill {
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      background:#eef3f8;
-      color:var(--muted);
-    }
-    .status-success { background:#e9f8ef; color:var(--success); }
-    .status-danger { background:#fff0ef; color:var(--danger); }
-    .hidden { display:none !important; }
-    .section-block {
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      margin-bottom:16px;
-    }
-    .section-head {
-      padding:14px 16px;
-      background:#f7fafe;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .section-head h3 { margin:0; font-size:17px; }
-    .section-score { font-size:13px; font-weight:700; color:var(--primary-2); }
-    .criteria-item {
-      padding:16px;
-      border-bottom:1px solid #edf1f5;
-      background:#fff;
-    }
-    .criteria-item:last-child { border-bottom:none; }
-    .criteria-top {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:14px;
-      margin-bottom:12px;
-      flex-wrap:wrap;
-    }
-    .criteria-title { font-weight:700; }
-    .criteria-meta { font-size:12px; color:var(--muted); margin-top:4px; }
-    .option-row {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .option-card {
-      border:1px solid #d6dfeb;
-      border-radius:14px;
-      padding:12px;
-      background:#fbfdff;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-    .option-card.active {
-      border-color:#7eb6f7;
-      background:#eef6ff;
-      box-shadow:0 0 0 3px rgba(0,102,204,.08);
-    }
-    .option-card input { width:auto; margin-right:8px; }
-    .option-label { font-weight:600; display:flex; align-items:center; }
-    .option-points { font-size:12px; color:var(--muted); margin-top:6px; }
-    .score-panel {
-      position:sticky;
-      bottom:10px;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:blur(10px);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      box-shadow:var(--shadow);
-      margin-top:18px;
-    }
-    .score-grid {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-    .score-box {
-      background:#f7fafe;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-    }
-    .score-box .label { font-size:12px; color:var(--muted); margin-bottom:6px; }
-    .score-box .value { font-size:22px; font-weight:800; }
-    .msg {
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius:12px;
-      font-size:14px;
-      display:none;
-    }
-    .msg.ok { display:block; background:#e9f8ef; color:var(--success); }
-    .msg.err { display:block; background:#fff0ef; color:var(--danger); }
-    .preview-frame {
-      width:100%;
-      min-height:420px;
-      border:1px dashed #bfd0e2;
-      border-radius:18px;
-      background:linear-gradient(180deg,#fcfdff 0%, #f5f8fc 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      color:var(--muted);
-      text-align:center;
-    }
-    @media (max-width: 900px) {
-      .score-grid { grid-template-columns:1fr 1fr; }
-      .field.col-6, .field.col-4, .field.col-3 { grid-column:span 12; }
-    }
-    @media (max-width: 640px) {
-      .app-shell { padding:16px 12px 28px; }
-      .hero h1 { font-size:26px; }
-      .score-grid { grid-template-columns:1fr; }
-      .card-head { padding:16px; }
-      .card-body { padding:16px; }
-    }
+    :root{--bg:#f5f7fb;--card:#fff;--line:#dbe4ef;--text:#17324d;--muted:#62758b;--pri:#0066cc;--pri2:#004f9e;--ok:#14804a;--err:#c53b32;--shadow:0 10px 30px rgba(14,32,61,.08);--rad:18px}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#edf4fb 0,#f6f8fc 100%);color:var(--text)}
+    .wrap{max-width:1180px;margin:0 auto;padding:20px 14px 36px}.hero{background:linear-gradient(135deg,#0d5cab 0,#0c7be0 100%);color:#fff;border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px}.hero h1{margin:0;font-size:30px;line-height:1.1}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--shadow);overflow:hidden}.card+.card{margin-top:18px}.head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.head h2{margin:0;font-size:20px}.head p{margin:4px 0 0;color:var(--muted);font-size:13px}.body{padding:20px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.field{grid-column:span 12}.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3} label{display:block;font-size:13px;font-weight:700;margin-bottom:8px} input,select,textarea,button{font:inherit} input,select,textarea{width:100%;border:1px solid #cfd9e6;background:#fff;border-radius:12px;padding:12px 14px;color:var(--text);outline:none} input:focus,select:focus,textarea:focus{border-color:#7eb6f7;box-shadow:0 0 0 4px rgba(0,102,204,.12)} textarea{min-height:88px;resize:vertical}.ro{background:#f7f9fc}.btnrow{display:flex;gap:12px;flex-wrap:wrap}.btn{border:none;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;min-height:46px}.pri{background:var(--pri);color:#fff}.pri:hover{background:var(--pri2)}.sec{background:#eef4fb;color:var(--pri2)}.sec:hover{background:#e3edf8}.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700;background:#eef3f8;color:var(--muted)}.ok{background:#e9f8ef;color:var(--ok)}.err{background:#fff0ef;color:var(--err)}.hidden{display:none!important}.secblk{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:16px}.sech{padding:14px 16px;background:#f7fafe;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.sech h3{margin:0;font-size:17px}.secscore{font-size:13px;font-weight:700;color:var(--pri2)}.crit{padding:16px;border-bottom:1px solid #edf1f5}.crit:last-child{border-bottom:none}.ctop{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}.ctitle{font-weight:700}.cmeta{font-size:12px;color:var(--muted);margin-top:4px}.orow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px}.ocard{border:1px solid #d6dfeb;border-radius:14px;padding:12px;background:#fbfdff;cursor:pointer}.ocard.active{border-color:#7eb6f7;background:#eef6ff;box-shadow:0 0 0 3px rgba(0,102,204,.08)}.olabel{font-weight:600;display:flex;align-items:center}.opoints{font-size:12px;color:var(--muted);margin-top:6px}.score{position:sticky;bottom:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-top:18px}.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sbox{background:#f7fafe;border:1px solid var(--line);border-radius:14px;padding:14px}.sbox .l{font-size:12px;color:var(--muted);margin-bottom:6px}.sbox .v{font-size:22px;font-weight:800}.msg{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:14px;display:none}.msg.ok{display:block;background:#e9f8ef;color:var(--ok)}.msg.err{display:block;background:#fff0ef;color:var(--err)}
+    @media (max-width:900px){.sgrid{grid-template-columns:1fr 1fr}.c6,.c4,.c3{grid-column:span 12}}
+    @media (max-width:640px){.wrap{padding:14px 10px 24px}.hero h1{font-size:24px}.sgrid{grid-template-columns:1fr}.head,.body{padding:16px}}
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <section class="hero">
-      <h1>DSP Audit App</h1>
-    </section>
+  <div class="wrap">
+    <div class="hero"><h1>DSP Audit App</h1></div>
 
     <section class="card" id="loginCard">
-      <div class="card-head">
-        <div>
-          <h2>User Login</h2>
-          <p>Sign in using employee ID and password from the Users master sheet.</p>
-        </div>
-      </div>
-      <div class="card-body">
+      <div class="head"><div><h2>User Login</h2><p>Use Employee ID and Password from the Users sheet.</p></div></div>
+      <div class="body">
         <div class="grid">
-          <div class="field col-6">
-            <label for="employeeId">Employee ID</label>
-            <input type="text" id="employeeId" placeholder="Enter employee ID">
-          </div>
-          <div class="field col-6">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Enter password">
-          </div>
+          <div class="field c6"><label for="employeeId">Employee ID</label><input id="employeeId" type="text" placeholder="Enter employee ID"></div>
+          <div class="field c6"><label for="password">Password</label><input id="password" type="password" placeholder="Enter password"></div>
         </div>
-        <div class="btn-row" style="margin-top:16px;">
-          <button class="btn btn-primary" id="loginBtn">Login</button>
-        </div>
+        <div class="btnrow" style="margin-top:16px;"><button class="btn pri" id="loginBtn">Login</button></div>
         <div id="loginMsg" class="msg"></div>
       </div>
     </section>
 
     <section class="card hidden" id="auditCard">
-      <div class="card-head">
-        <div>
-          <h2>Audit Form</h2>
-          <p>Store selection, location validation, evidence upload, dynamic criteria scoring, and final audit submission.</p>
-        </div>
-        <span class="status-pill status-success" id="userBadge">Logged In</span>
-      </div>
-      <div class="card-body">
+      <div class="head"><div><h2>Audit Form</h2><p>Store details, GPS capture, photo uploads, and audit scoring.</p></div><span class="pill ok" id="userBadge">Logged In</span></div>
+      <div class="body">
         <div class="grid">
-          <div class="field col-6">
-            <label for="dspSelect">Select DSP</label>
-            <select id="dspSelect">
-              <option value="">Select mapped DSP</option>
-            </select>
-          </div>
-          <div class="field col-3">
-            <label for="auditDate">Audit Date</label>
-            <input type="date" id="auditDate">
-          </div>
-          <div class="field col-3">
-            <label for="auditTime">Audit Time</label>
-            <input type="time" id="auditTime">
-          </div>
-
-          <div class="field col-4"><label>DSP Code</label><input id="dspCode" class="readonly" readonly></div>
-          <div class="field col-4"><label>Store Name</label><input id="dspName" class="readonly" readonly></div>
-          <div class="field col-4"><label>Dealer Name</label><input id="dealerName" class="readonly" readonly></div>
-          <div class="field col-4"><label>Owner Name</label><input id="ownerName" class="readonly" readonly></div>
-          <div class="field col-4"><label>Owner Number</label><input id="ownerNumber" class="readonly" readonly></div>
-          <div class="field col-4"><label>City</label><input id="city" class="readonly" readonly></div>
-          <div class="field col-3"><label>Pincode</label><input id="pincode" class="readonly" readonly></div>
-          <div class="field col-3"><label>State</label><input id="state" class="readonly" readonly></div>
-          <div class="field col-3"><label>Region</label><input id="region" class="readonly" readonly></div>
-          <div class="field col-3"><label>Branch</label><input id="branch" class="readonly" readonly></div>
-          <div class="field col-6"><label>ASM Name</label><input id="asmName" class="readonly" readonly></div>
-          <div class="field col-6"><label>ISD Deployment</label><input id="isdDeployment" class="readonly" readonly></div>
+          <div class="field c6"><label for="dspSelect">Select DSP</label><select id="dspSelect"><option value="">Select mapped DSP</option></select></div>
+          <div class="field c3"><label for="auditDate">Audit Date</label><input id="auditDate" type="date"></div>
+          <div class="field c3"><label for="auditTime">Audit Time</label><input id="auditTime" type="time"></div>
+          <div class="field c4"><label>DSP Code</label><input id="dspCode" class="ro" readonly></div><div class="field c4"><label>Store Name</label><input id="dspName" class="ro" readonly></div><div class="field c4"><label>Dealer Name</label><input id="dealerName" class="ro" readonly></div>
+          <div class="field c4"><label>Owner Name</label><input id="ownerName" class="ro" readonly></div><div class="field c4"><label>Owner Number</label><input id="ownerNumber" class="ro" readonly></div><div class="field c4"><label>City</label><input id="city" class="ro" readonly></div>
+          <div class="field c3"><label>Pincode</label><input id="pincode" class="ro" readonly></div><div class="field c3"><label>State</label><input id="state" class="ro" readonly></div><div class="field c3"><label>Region</label><input id="region" class="ro" readonly></div><div class="field c3"><label>Branch</label><input id="branch" class="ro" readonly></div>
+          <div class="field c6"><label>ASM Name</label><input id="asmName" class="ro" readonly></div><div class="field c6"><label>ISD Deployment</label><input id="isdDeployment" class="ro" readonly></div>
         </div>
 
-        <div class="card" style="margin-top:20px; box-shadow:none;">
-          <div class="card-head">
-            <div>
-              <h2 style="font-size:18px;">Geo Verification</h2>
-              <p>Capture merchandiser location before submission.</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="btn-row">
-              <button class="btn btn-secondary" type="button" id="gpsBtn">Capture GPS</button>
-            </div>
-            <div class="grid" style="margin-top:14px;">
-              <div class="field col-4"><label>Captured Latitude</label><input id="capturedLatitude" class="readonly" readonly></div>
-              <div class="field col-4"><label>Captured Longitude</label><input id="capturedLongitude" class="readonly" readonly></div>
-              <div class="field col-4"><label>Captured At</label><input id="locationCapturedAt" class="readonly" readonly></div>
-            </div>
+        <div class="card" style="margin-top:20px;box-shadow:none;">
+          <div class="head"><div><h2 style="font-size:18px;">Geo Verification</h2><p>Capture the location before submission.</p></div></div>
+          <div class="body">
+            <div class="btnrow"><button class="btn sec" id="gpsBtn" type="button">Capture GPS</button></div>
+            <div class="grid" style="margin-top:14px;"><div class="field c4"><label>Captured Latitude</label><input id="capturedLatitude" class="ro" readonly></div><div class="field c4"><label>Captured Longitude</label><input id="capturedLongitude" class="ro" readonly></div><div class="field c4"><label>Captured At</label><input id="locationCapturedAt" class="ro" readonly></div></div>
             <div id="gpsMsg" class="msg"></div>
           </div>
         </div>
 
-        <div class="card" style="margin-top:20px; box-shadow:none;">
-          <div class="card-head">
-            <div>
-              <h2 style="font-size:18px;">Photo Evidence</h2>
-              <p>Shopfront is mandatory. Up to 5 additional store photos can be uploaded.</p>
-            </div>
-          </div>
-          <div class="card-body">
+        <div class="card" style="margin-top:20px;box-shadow:none;">
+          <div class="head"><div><h2 style="font-size:18px;">Photo Evidence</h2><p>Shopfront is mandatory. Add up to 5 store photos.</p></div></div>
+          <div class="body">
             <div class="grid">
-              <div class="field col-6">
-                <label for="shopfrontPhoto">Shopfront Photo</label>
-                <input type="file" id="shopfrontPhoto" accept="image/*" capture="environment">
-              </div>
-              <div class="field col-6">
-                <label for="storePhoto1">Store Photo 1</label>
-                <input type="file" id="storePhoto1" accept="image/*" capture="environment">
-              </div>
-              <div class="field col-6">
-                <label for="storePhoto2">Store Photo 2</label>
-                <input type="file" id="storePhoto2" accept="image/*" capture="environment">
-              </div>
-              <div class="field col-6">
-                <label for="storePhoto3">Store Photo 3</label>
-                <input type="file" id="storePhoto3" accept="image/*" capture="environment">
-              </div>
-              <div class="field col-6">
-                <label for="storePhoto4">Store Photo 4</label>
-                <input type="file" id="storePhoto4" accept="image/*" capture="environment">
-              </div>
-              <div class="field col-6">
-                <label for="storePhoto5">Store Photo 5</label>
-                <input type="file" id="storePhoto5" accept="image/*" capture="environment">
-              </div>
+              <div class="field c6"><label for="shopfrontPhoto">Shopfront Photo</label><input id="shopfrontPhoto" type="file" accept="image/*" capture="environment"></div>
+              <div class="field c6"><label for="storePhoto1">Store Photo 1</label><input id="storePhoto1" type="file" accept="image/*" capture="environment"></div>
+              <div class="field c6"><label for="storePhoto2">Store Photo 2</label><input id="storePhoto2" type="file" accept="image/*" capture="environment"></div>
+              <div class="field c6"><label for="storePhoto3">Store Photo 3</label><input id="storePhoto3" type="file" accept="image/*" capture="environment"></div>
+              <div class="field c6"><label for="storePhoto4">Store Photo 4</label><input id="storePhoto4" type="file" accept="image/*" capture="environment"></div>
+              <div class="field c6"><label for="storePhoto5">Store Photo 5</label><input id="storePhoto5" type="file" accept="image/*" capture="environment"></div>
             </div>
             <div id="uploadMsg" class="msg"></div>
           </div>
         </div>
 
-        <div class="card" style="margin-top:20px; box-shadow:none;">
-          <div class="card-head">
-            <div>
-              <h2 style="font-size:18px;">Audit Parameters</h2>
-              <p>Criteria are loaded dynamically from CriteriaMaster and OptionMaster.</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div id="criteriaContainer"></div>
-          </div>
+        <div class="card" style="margin-top:20px;box-shadow:none;">
+          <div class="head"><div><h2 style="font-size:18px;">Audit Parameters</h2><p>Loaded dynamically from CriteriaMaster and OptionMaster.</p></div></div>
+          <div class="body"><div id="criteriaContainer"></div></div>
         </div>
 
-        <div class="grid" style="margin-top:20px;">
-          <div class="field col-12">
-            <label for="overallRemarks">Overall Remarks</label>
-            <textarea id="overallRemarks" placeholder="Enter remarks or corrective notes"></textarea>
-          </div>
-        </div>
+        <div class="grid" style="margin-top:20px;"><div class="field"><label for="overallRemarks">Overall Remarks</label><textarea id="overallRemarks" placeholder="Enter remarks or corrective notes"></textarea></div></div>
 
-        <div class="score-panel">
-          <div class="score-grid">
-            <div class="score-box">
-              <div class="label">Final Score</div>
-              <div class="value" id="finalScore">0.00</div>
-            </div>
-            <div class="score-box">
-              <div class="label">Compliance %</div>
-              <div class="value" id="compliancePercent">0</div>
-            </div>
-            <div class="score-box">
-              <div class="label">Grade</div>
-              <div class="value" id="gradeText">Pending</div>
-            </div>
-            <div class="score-box">
-              <div class="label">Criteria Answered</div>
-              <div class="value" id="answeredCount">0</div>
-            </div>
-          </div>
-          <div class="btn-row" style="margin-top:16px;">
-            <button class="btn btn-primary" id="submitBtn" type="button">Submit Audit</button>
-            <button class="btn btn-secondary" id="resetBtn" type="button">Reset Form</button>
-          </div>
+        <div class="score">
+          <div class="sgrid"><div class="sbox"><div class="l">Final Score</div><div class="v" id="finalScore">0.00</div></div><div class="sbox"><div class="l">Compliance %</div><div class="v" id="compliancePercent">0</div></div><div class="sbox"><div class="l">Grade</div><div class="v" id="gradeText">Pending</div></div><div class="sbox"><div class="l">Answered</div><div class="v" id="answeredCount">0</div></div></div>
+          <div class="btnrow" style="margin-top:16px;"><button class="btn pri" id="submitBtn" type="button">Submit Audit</button><button class="btn sec" id="resetBtn" type="button">Reset Form</button></div>
           <div id="submitMsg" class="msg"></div>
         </div>
       </div>
     </section>
   </div>
 
-  <script>
-const API_BASE = 'https://script.google.com/macros/s/AKfycbxy8EezZMRnxhDsW9FZTW2d19EZuunPPCCa5rA3PXgUE0L5kaNnqilUHBhLYyVkJxBMMA/exec';
+<script>
+const API_BASE='https://script.google.com/macros/s/AKfycbwUoWTFx_MT_hm1qyUn57SHgt27t1hhjpY-0m2UNF0ntB22sUxHfm4qNv_WFhhOUOFAYQ/exec';
 const state={user:null,stores:[],criteria:[],grades:[],selectedStore:null,responses:{},uploadedUrls:{shopfrontPhotoURL:'',storePhoto1URL:'',storePhoto2URL:'',storePhoto3URL:'',storePhoto4URL:'',storePhoto5URL:''},gps:{lat:'',lng:'',capturedAt:''}};
 const $=id=>document.getElementById(id);
-const els={loginCard:$("loginCard"),auditCard:$("auditCard"),employeeId:$("employeeId"),password:$("password"),loginBtn:$("loginBtn"),loginMsg:$("loginMsg"),dspSelect:$("dspSelect"),auditDate:$("auditDate"),auditTime:$("auditTime"),dspCode:$("dspCode"),dspName:$("dspName"),dealerName:$("dealerName"),ownerName:$("ownerName"),ownerNumber:$("ownerNumber"),city:$("city"),pincode:$("pincode"),state:$("state"),region:$("region"),branch:$("branch"),asmName:$("asmName"),isdDeployment:$("isdDeployment"),gpsBtn:$("gpsBtn"),gpsBadge:$("gpsBadge"),gpsMsg:$("gpsMsg"),capturedLatitude:$("capturedLatitude"),capturedLongitude:$("capturedLongitude"),locationCapturedAt:$("locationCapturedAt"),criteriaContainer:$("criteriaContainer"),finalScore:$("finalScore"),compliancePercent:$("compliancePercent"),gradeText:$("gradeText"),answeredCount:$("answeredCount"),overallRemarks:$("overallRemarks"),submitBtn:$("submitBtn"),resetBtn:$("resetBtn"),submitMsg:$("submitMsg"),uploadMsg:$("uploadMsg"),shopfrontPhoto:$("shopfrontPhoto"),storePhoto1:$("storePhoto1"),storePhoto2:$("storePhoto2"),storePhoto3:$("storePhoto3"),storePhoto4:$("storePhoto4"),storePhoto5:$("storePhoto5")};
+const el={loginCard:$('loginCard'),auditCard:$('auditCard'),employeeId:$('employeeId'),password:$('password'),loginBtn:$('loginBtn'),loginMsg:$('loginMsg'),dspSelect:$('dspSelect'),auditDate:$('auditDate'),auditTime:$('auditTime'),dspCode:$('dspCode'),dspName:$('dspName'),dealerName:$('dealerName'),ownerName:$('ownerName'),ownerNumber:$('ownerNumber'),city:$('city'),pincode:$('pincode'),state:$('state'),region:$('region'),branch:$('branch'),asmName:$('asmName'),isdDeployment:$('isdDeployment'),gpsBtn:$('gpsBtn'),gpsMsg:$('gpsMsg'),capturedLatitude:$('capturedLatitude'),capturedLongitude:$('capturedLongitude'),locationCapturedAt:$('locationCapturedAt'),criteriaContainer:$('criteriaContainer'),finalScore:$('finalScore'),compliancePercent:$('compliancePercent'),gradeText:$('gradeText'),answeredCount:$('answeredCount'),overallRemarks:$('overallRemarks'),submitBtn:$('submitBtn'),resetBtn:$('resetBtn'),submitMsg:$('submitMsg'),uploadMsg:$('uploadMsg'),shopfrontPhoto:$('shopfrontPhoto'),storePhoto1:$('storePhoto1'),storePhoto2:$('storePhoto2'),storePhoto3:$('storePhoto3'),storePhoto4:$('storePhoto4'),storePhoto5:$('storePhoto5')};
 const photos=[{id:'shopfrontPhoto',key:'shopfrontPhotoURL',req:true},{id:'storePhoto1',key:'storePhoto1URL'},{id:'storePhoto2',key:'storePhoto2URL'},{id:'storePhoto3',key:'storePhoto3URL'},{id:'storePhoto4',key:'storePhoto4URL'},{id:'storePhoto5',key:'storePhoto5URL'}];
-document.addEventListener('DOMContentLoaded',()=>{const n=new Date();els.auditDate.value=n.toISOString().slice(0,10);els.auditTime.value=n.toTimeString().slice(0,5);bind();});
-function bind(){els.loginBtn.onclick=login;els.dspSelect.onchange=storeChange;els.gpsBtn.onclick=gps;els.submitBtn.onclick=submit;els.resetBtn.onclick=reset;}
-async function login(){const employeeId=els.employeeId.value.trim(),password=els.password.value.trim();if(!employeeId||!password)return msg(els.loginMsg,'Enter employee ID and password.','err');els.loginBtn.disabled=true;els.loginBtn.textContent='Logging in...';try{const u=API_BASE+'?action=login&employeeId='+encodeURIComponent(employeeId)+'&password='+encodeURIComponent(password);const d=await jget(u);if(!d.success)throw new Error(d.message||'Login failed');state.user=d.user;state.stores=d.stores||[];state.criteria=d.criteria||[];state.grades=d.grades||[];els.loginCard.classList.add('hidden');els.auditCard.classList.remove('hidden');renderStores();renderCriteria();score();msg(els.submitMsg,'Login successful. Audit form is ready.','ok');}catch(e){msg(els.loginMsg,e.message,'err');}finally{els.loginBtn.disabled=false;els.loginBtn.textContent='Login';}}
-function renderStores(){els.dspSelect.innerHTML='<option value="">Select mapped DSP</option>';state.stores.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(s.DSPCode||'')+' - '+(s.DSPName||'')+' ('+(s.City||'')+')';els.dspSelect.appendChild(o);});}
-function storeChange(){const s=state.stores[Number(els.dspSelect.value)]||null;state.selectedStore=s;[['dspCode','DSPCode'],['dspName','DSPName'],['dealerName','DealerName'],['ownerName','OwnerName'],['ownerNumber','OwnerNumber'],['city','City'],['pincode','Pincode'],['state','State'],['region','Region'],['branch','Branch'],['asmName','ASMName'],['isdDeployment','ISDDeployment']].forEach(([a,b])=>$(a).value=s?s[b]||'':'');}
-function renderCriteria(){const grouped={};state.criteria.forEach(c=>{(grouped[c.SectionName]=grouped[c.SectionName]||[]).push(c);});els.criteriaContainer.innerHTML='';Object.keys(grouped).forEach(sec=>{const wrap=document.createElement('div');wrap.className='section-block';wrap.innerHTML='<div class="section-head"><h3>'+esc(sec)+'</h3><div class="section-score" id="sectionScore_'+slug(sec)+'">0.00</div></div><div class="section-body"></div>';const body=wrap.querySelector('.section-body');grouped[sec].forEach(item=>{const itemDiv=document.createElement('div');itemDiv.className='criteria-item';itemDiv.innerHTML='<div class="criteria-top"><div><div class="criteria-title">'+esc(item.ParameterName)+'</div><div class="criteria-meta">Weightage: '+Number(item.Weightage).toFixed(2)+' · Photo Required: '+esc(item.PhotoRequired||'No')+'</div></div><div class="criteria-meta">Criteria ID: '+esc(item.CriteriaID)+'</div></div><div class="option-row">'+(item.Options||[]).map(opt=>'<label class="option-card" data-criteria="'+item.CriteriaID+'" data-optionid="'+opt.OptionID+'" data-points="'+opt.OptionPoints+'"><div class="option-label"><input type="radio" name="criteria_'+item.CriteriaID+'" value="'+opt.OptionID+'"><span>'+esc(opt.OptionLabel)+'</span></div><div class="option-points">Points: '+opt.OptionPoints+'</div></label>').join('')+'</div>';body.appendChild(itemDiv);});els.criteriaContainer.appendChild(wrap);});document.querySelectorAll('.option-card').forEach(card=>card.onclick=()=>{const cid=card.dataset.criteria,oid=card.dataset.optionid,pts=Number(card.dataset.points||0),c=state.criteria.find(x=>x.CriteriaID===cid),o=c?.Options?.find(x=>x.OptionID===oid);state.responses[cid]={CriteriaID:cid,ParameterName:c?.ParameterName||'',SectionName:c?.SectionName||'',Weightage:Number(c?.Weightage||0),SelectedOptionID:oid,SelectedOption:o?.OptionLabel||'',SelectedPoints:pts,WeightedScore:Number((((pts||0)/10)*Number(c?.Weightage||0)*10).toFixed(2))};document.querySelectorAll('.option-card[data-criteria="'+cid+'"]').forEach(x=>x.classList.remove('active'));card.classList.add('active');const r=card.querySelector('input');if(r)r.checked=true;score();});}
-function score(){const res=Object.values(state.responses);const final=res.reduce((s,r)=>s+Number(r.WeightedScore||0),0);const pct=Number((final*10).toFixed(0));const grade=(state.grades.find(g=>pct>=Number(g.CompliancePercentFrom)&&pct<=Number(g.CompliancePercentTo))||{}).GradeName||'Pending';els.finalScore.textContent=final.toFixed(2);els.compliancePercent.textContent=pct+'%';els.gradeText.textContent=grade;els.answeredCount.textContent=res.length;document.querySelectorAll('[id^="sectionScore_"]').forEach(el=>el.textContent='0.00');const gs={};res.forEach(r=>gs[r.SectionName]=(gs[r.SectionName]||0)+Number(r.WeightedScore||0));Object.keys(gs).forEach(sec=>{const el=$('sectionScore_'+slug(sec));if(el)el.textContent=gs[sec].toFixed(2);});}
-function gps(){if(!navigator.geolocation)return msg(els.gpsMsg,'Geolocation is not supported on this device.','err');els.gpsBtn.disabled=true;els.gpsBtn.textContent='Capturing...';navigator.geolocation.getCurrentPosition(p=>{state.gps.lat=String(p.coords.latitude);state.gps.lng=String(p.coords.longitude);state.gps.capturedAt=new Date().toLocaleString();els.capturedLatitude.value=state.gps.lat;els.capturedLongitude.value=state.gps.lng;els.locationCapturedAt.value=state.gps.capturedAt;els.gpsBadge.textContent='GPS captured';els.gpsBadge.className='status-pill status-success';msg(els.gpsMsg,'GPS captured successfully.','ok');els.gpsBtn.disabled=false;els.gpsBtn.textContent='Capture GPS';},e=>{msg(els.gpsMsg,e.message||'Unable to capture GPS.','err');els.gpsBadge.textContent='GPS failed';els.gpsBadge.className='status-pill status-danger';els.gpsBtn.disabled=false;els.gpsBtn.textContent='Capture GPS';},{enableHighAccuracy:true,timeout:15000,maximumAge:0});}
-async function submit(){if(!state.user)return msg(els.submitMsg,'Please login first.','err');if(!state.selectedStore)return msg(els.submitMsg,'Please select a DSP store.','err');if(!state.gps.lat||!state.gps.lng)return msg(els.submitMsg,'Please capture GPS before submission.','err');if(Object.keys(state.responses).length!==state.criteria.length)return msg(els.submitMsg,'Please answer all audit criteria before submission.','err');els.submitBtn.disabled=true;els.submitBtn.textContent='Uploading photos...';try{await uploadPhotos();if(!state.uploadedUrls.shopfrontPhotoURL)throw new Error('Shopfront photo is mandatory.');els.submitBtn.textContent='Submitting audit...';const p=new URLSearchParams();p.append('action','submitAudit');p.append('auditDate',els.auditDate.value);p.append('auditTime',els.auditTime.value);p.append('employeeId',state.user.EmployeeID||'');p.append('employeeName',state.user.EmployeeName||'');p.append('role',state.user.Role||'');p.append('region',state.selectedStore.Region||state.user.Region||'');p.append('branch',state.selectedStore.Branch||state.user.Branch||'');p.append('dspCode',state.selectedStore.DSPCode||'');p.append('dspName',state.selectedStore.DSPName||'');p.append('dealerName',state.selectedStore.DealerName||'');p.append('ownerName',state.selectedStore.OwnerName||'');p.append('ownerNumber',state.selectedStore.OwnerNumber||'');p.append('city',state.selectedStore.City||'');p.append('pincode',state.selectedStore.Pincode||'');p.append('state',state.selectedStore.State||'');p.append('isdDeployment',state.selectedStore.ISDDeployment||'');p.append('asmName',state.selectedStore.ASMName||'');p.append('capturedLatitude',state.gps.lat||'');p.append('capturedLongitude',state.gps.lng||'');p.append('locationCapturedAt',state.gps.capturedAt||'');p.append('shopfrontPhotoURL',state.uploadedUrls.shopfrontPhotoURL||'');p.append('storePhoto1URL',state.uploadedUrls.storePhoto1URL||'');p.append('storePhoto2URL',state.uploadedUrls.storePhoto2URL||'');p.append('storePhoto3URL',state.uploadedUrls.storePhoto3URL||'');p.append('storePhoto4URL',state.uploadedUrls.storePhoto4URL||'');p.append('storePhoto5URL',state.uploadedUrls.storePhoto5URL||'');p.append('finalScore',$('finalScore').textContent);p.append('compliancePercent',$('compliancePercent').textContent.replace('%',''));p.append('grade',$('gradeText').textContent);p.append('overallRemarks',els.overallRemarks.value.trim());p.append('responsesJSON',JSON.stringify(Object.values(state.responses)));const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||'Submission failed');msg(els.submitMsg,'Audit submitted successfully. Audit ID: '+d.auditId,'ok');}catch(e){msg(els.submitMsg,e.message,'err');}finally{els.submitBtn.disabled=false;els.submitBtn.textContent='Submit Audit';}}
-async function uploadPhotos(){for(const f of photos){const input=$(f.id),file=input.files&&input.files[0];if(!file){if(f.req)throw new Error('Please upload the mandatory shopfront photo.');continue;}const base64=await toBase64(file);const p=new URLSearchParams();p.append('action','uploadImage');p.append('fileName',Date.now()+'_'+file.name);p.append('mimeType',file.type||'image/jpeg');p.append('base64Data',base64.split(',')[1]);const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||('Image upload failed for '+f.id));state.uploadedUrls[f.key]=d.fileUrl;}}
-function reset(){state.selectedStore=null;state.responses={};state.uploadedUrls={shopfrontPhotoURL:'',storePhoto1URL:'',storePhoto2URL:'',storePhoto3URL:'',storePhoto4URL:'',storePhoto5URL:''};state.gps={lat:'',lng:'',capturedAt:''};els.dspSelect.value='';['dspCode','dspName','dealerName','ownerName','ownerNumber','city','pincode','state','region','branch','asmName','isdDeployment','capturedLatitude','capturedLongitude','locationCapturedAt','overallRemarks'].forEach(id=>$(id).value='');photos.forEach(p=>$(p.id).value='');renderCriteria();score();els.gpsBadge.textContent='GPS pending';els.gpsBadge.className='status-pill';clear(els.gpsMsg);clear(els.submitMsg);clear(els.uploadMsg);}
-function msg(el,t,typ){el.className='msg '+typ;el.textContent=t;}
-function clear(el){el.className='msg';el.textContent='';}
+document.addEventListener('DOMContentLoaded',()=>{const n=new Date();el.auditDate.value=n.toISOString().slice(0,10);el.auditTime.value=n.toTimeString().slice(0,5);bind();});
+function bind(){el.loginBtn.onclick=login;el.dspSelect.onchange=storeChange;el.gpsBtn.onclick=gps;el.submitBtn.onclick=submit;el.resetBtn.onclick=reset;}
+async function login(){const employeeId=el.employeeId.value.trim(),password=el.password.value.trim();if(!employeeId||!password)return msg(el.loginMsg,'Enter employee ID and password.','err');el.loginBtn.disabled=true;el.loginBtn.textContent='Logging in...';try{const u=API_BASE+'?action=LOGIN&employeeId='+encodeURIComponent(employeeId)+'&password='+encodeURIComponent(password);const d=await jget(u);if(!d.success)throw new Error(d.message||'Login failed');state.user=d.user;state.stores=d.stores||[];state.criteria=d.criteria||[];state.grades=d.grades||[];el.loginCard.classList.add('hidden');el.auditCard.classList.remove('hidden');renderStores();renderCriteria();score();msg(el.submitMsg,'Login successful. Audit form is ready.','ok');}catch(e){msg(el.loginMsg,e.message,'err')}finally{el.loginBtn.disabled=false;el.loginBtn.textContent='Login'}}
+function renderStores(){el.dspSelect.innerHTML='<option value="">Select mapped DSP</option>';state.stores.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(s.DSPCode||'')+' - '+(s.DSPName||'')+' ('+(s.City||'')+')';el.dspSelect.appendChild(o)})}
+function storeChange(){const s=state.stores[Number(el.dspSelect.value)]||null;state.selectedStore=s;[['dspCode','DSPCode'],['dspName','DSPName'],['dealerName','DealerName'],['ownerName','OwnerName'],['ownerNumber','OwnerNumber'],['city','City'],['pincode','Pincode'],['state','State'],['region','Region'],['branch','Branch'],['asmName','ASMName'],['isdDeployment','ISDDeployment']].forEach(([a,b])=>$(a).value=s?s[b]||'':'')}
+function renderCriteria(){const grouped={};state.criteria.forEach(c=>(grouped[c.SectionName]=grouped[c.SectionName]||[]).push(c));el.criteriaContainer.innerHTML='';Object.keys(grouped).forEach(sec=>{const wrap=document.createElement('div');wrap.className='secblk';wrap.innerHTML='<div class="sech"><h3>'+esc(sec)+'</h3><div class="secscore" id="sectionScore_'+slug(sec)+'">0.00</div></div><div class="section-body"></div>';const body=wrap.querySelector('.section-body');grouped[sec].forEach(item=>{const itemDiv=document.createElement('div');itemDiv.className='crit';itemDiv.innerHTML='<div class="ctop"><div><div class="ctitle">'+esc(item.ParameterName)+'</div><div class="cmeta">Weightage: '+Number(item.Weightage).toFixed(2)+' · Photo Required: '+esc(item.PhotoRequired||'No')+'</div></div><div class="cmeta">Criteria ID: '+esc(item.CriteriaID)+'</div></div><div class="orow">'+(item.Options||[]).map(opt=>'<label class="ocard" data-criteria="'+item.CriteriaID+'" data-optionid="'+opt.OptionID+'" data-points="'+opt.OptionPoints+'"><div class="olabel"><input type="radio" name="criteria_'+item.CriteriaID+'" value="'+opt.OptionID+'"><span>'+esc(opt.OptionLabel)+'</span></div><div class="opoints">Points: '+opt.OptionPoints+'</div></label>').join('')+'</div>';body.appendChild(itemDiv)});el.criteriaContainer.appendChild(wrap)});document.querySelectorAll('.ocard').forEach(card=>card.onclick=()=>{const cid=card.dataset.criteria,oid=card.dataset.optionid,pts=Number(card.dataset.points||0),c=state.criteria.find(x=>x.CriteriaID===cid),o=c?.Options?.find(x=>x.OptionID===oid);state.responses[cid]={CriteriaID:cid,ParameterName:c?.ParameterName||'',SectionName:c?.SectionName||'',Weightage:Number(c?.Weightage||0),SelectedOptionID:oid,SelectedOption:o?.OptionLabel||'',SelectedPoints:pts,WeightedScore:Number((((pts||0)/10)*Number(c?.Weightage||0)*10).toFixed(2))};document.querySelectorAll('.ocard[data-criteria="'+cid+'"]').forEach(x=>x.classList.remove('active'));card.classList.add('active');const r=card.querySelector('input');if(r)r.checked=true;score()})}
+function score(){const res=Object.values(state.responses);const final=res.reduce((s,r)=>s+Number(r.WeightedScore||0),0);const pct=Number((final*10).toFixed(0));const grade=(state.grades.find(g=>pct>=Number(g.CompliancePercentFrom)&&pct<=Number(g.CompliancePercentTo))||{}).GradeName||'Pending';el.finalScore.textContent=final.toFixed(2);el.compliancePercent.textContent=pct+'%';el.gradeText.textContent=grade;el.answeredCount.textContent=res.length;document.querySelectorAll('[id^="sectionScore_"]').forEach(x=>x.textContent='0.00');const gs={};res.forEach(r=>gs[r.SectionName]=(gs[r.SectionName]||0)+Number(r.WeightedScore||0));Object.keys(gs).forEach(sec=>{const x=$('sectionScore_'+slug(sec));if(x)x.textContent=gs[sec].toFixed(2)})}
+function gps(){if(!navigator.geolocation)return msg(el.gpsMsg,'Geolocation is not supported on this device.','err');el.gpsBtn.disabled=true;el.gpsBtn.textContent='Capturing...';navigator.geolocation.getCurrentPosition(p=>{state.gps.lat=String(p.coords.latitude);state.gps.lng=String(p.coords.longitude);state.gps.capturedAt=new Date().toLocaleString();el.capturedLatitude.value=state.gps.lat;el.capturedLongitude.value=state.gps.lng;el.locationCapturedAt.value=state.gps.capturedAt;msg(el.gpsMsg,'GPS captured successfully.','ok');el.gpsBtn.disabled=false;el.gpsBtn.textContent='Capture GPS'},e=>{msg(el.gpsMsg,e.message||'Unable to capture GPS.','err');el.gpsBtn.disabled=false;el.gpsBtn.textContent='Capture GPS'},{enableHighAccuracy:true,timeout:15000,maximumAge:0})}
+async function submit(){if(!state.user)return msg(el.submitMsg,'Please login first.','err');if(!state.selectedStore)return msg(el.submitMsg,'Please select a DSP store.','err');if(!state.gps.lat||!state.gps.lng)return msg(el.submitMsg,'Please capture GPS before submission.','err');if(Object.keys(state.responses).length!==state.criteria.length)return msg(el.submitMsg,'Please answer all audit criteria before submission.','err');el.submitBtn.disabled=true;el.submitBtn.textContent='Uploading photos...';try{await uploadPhotos();if(!state.uploadedUrls.shopfrontPhotoURL)throw new Error('Shopfront photo is mandatory.');el.submitBtn.textContent='Submitting audit...';const p=new URLSearchParams();p.append('action','SUBMITAUDIT');p.append('auditDate',el.auditDate.value);p.append('auditTime',el.auditTime.value);p.append('employeeId',state.user.EmployeeID||'');p.append('employeeName',state.user.EmployeeName||'');p.append('role',state.user.Role||'');p.append('region',state.selectedStore.Region||state.user.Region||'');p.append('branch',state.selectedStore.Branch||state.user.Branch||'');p.append('dspCode',state.selectedStore.DSPCode||'');p.append('dspName',state.selectedStore.DSPName||'');p.append('dealerName',state.selectedStore.DealerName||'');p.append('ownerName',state.selectedStore.OwnerName||'');p.append('ownerNumber',state.selectedStore.OwnerNumber||'');p.append('city',state.selectedStore.City||'');p.append('pincode',state.selectedStore.Pincode||'');p.append('state',state.selectedStore.State||'');p.append('isdDeployment',state.selectedStore.ISDDeployment||'');p.append('asmName',state.selectedStore.ASMName||'');p.append('capturedLatitude',state.gps.lat||'');p.append('capturedLongitude',state.gps.lng||'');p.append('locationCapturedAt',state.gps.capturedAt||'');p.append('shopfrontPhotoURL',state.uploadedUrls.shopfrontPhotoURL||'');p.append('storePhoto1URL',state.uploadedUrls.storePhoto1URL||'');p.append('storePhoto2URL',state.uploadedUrls.storePhoto2URL||'');p.append('storePhoto3URL',state.uploadedUrls.storePhoto3URL||'');p.append('storePhoto4URL',state.uploadedUrls.storePhoto4URL||'');p.append('storePhoto5URL',state.uploadedUrls.storePhoto5URL||'');p.append('finalScore',$('finalScore').textContent);p.append('compliancePercent',$('compliancePercent').textContent.replace('%',''));p.append('grade',$('gradeText').textContent);p.append('overallRemarks',el.overallRemarks.value.trim());p.append('responsesJSON',JSON.stringify(Object.values(state.responses)));const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||'Submission failed');msg(el.submitMsg,'Audit submitted successfully. Audit ID: '+d.auditId,'ok')}catch(e){msg(el.submitMsg,e.message,'err')}finally{el.submitBtn.disabled=false;el.submitBtn.textContent='Submit Audit'}}
+async function uploadPhotos(){for(const f of photos){const input=$(f.id),file=input.files&&input.files[0];if(!file){if(f.req)throw new Error('Please upload the mandatory shopfront photo.');continue;}const base64=await toBase64(file);const p=new URLSearchParams();p.append('action','UPLOADIMAGE');p.append('fileName',Date.now()+'_'+file.name);p.append('mimeType',file.type||'image/jpeg');p.append('base64Data',base64.split(',')[1]);const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||('Image upload failed for '+f.id));state.uploadedUrls[f.key]=d.fileUrl}}
+function reset(){state.selectedStore=null;state.responses={};state.uploadedUrls={shopfrontPhotoURL:'',storePhoto1URL:'',storePhoto2URL:'',storePhoto3URL:'',storePhoto4URL:'',storePhoto5URL:''};state.gps={lat:'',lng:'',capturedAt:''};el.dspSelect.value='';['dspCode','dspName','dealerName','ownerName','ownerNumber','city','pincode','state','region','branch','asmName','isdDeployment','capturedLatitude','capturedLongitude','locationCapturedAt','overallRemarks'].forEach(id=>$(id).value='');photos.forEach(p=>$(p.id).value='');renderCriteria();score();clear(el.gpsMsg);clear(el.submitMsg);clear(el.uploadMsg)}
+function msg(t,e,s){t.className='msg '+s;t.textContent=e}
+function clear(t){t.className='msg';t.textContent=''}
 const jget=u=>fetch(u).then(r=>r.text()).then(t=>JSON.parse(t));
 const jpost=(u,p)=>fetch(u,{method:'POST',body:p}).then(r=>r.text()).then(t=>JSON.parse(t));
-const toBase64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
+const toBase64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 const slug=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
-  </script>
+</script>
 </body>
 </html>
 
