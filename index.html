@@ -4,933 +4,490 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daikin DSP Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --brand:#005BAC;
-      --brand-dark:#00427c;
-      --brand-light:#eaf4ff;
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#17212f;
-      --muted:#667085;
-      --line:#d7e2f0;
-      --ok:#15803d;
-      --warn:#b45309;
-      --bad:#b91c1c;
-      --radius:16px;
-      --shadow:0 10px 24px rgba(0,0,0,.08);
+    :root {
+      --bg:#f3f6fb;
+      --surface:#ffffff;
+      --surface-2:#f7f9fc;
+      --line:#dce4ee;
+      --text:#17324d;
+      --muted:#62758b;
+      --primary:#0066cc;
+      --primary-2:#004f9e;
+      --success:#14804a;
+      --danger:#c53b32;
+      --warning:#d97706;
+      --shadow:0 10px 30px rgba(14,32,61,.08);
+      --radius:18px;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    .app{max-width:1180px;margin:0 auto;padding:16px}
-    .hero{
-      background:linear-gradient(135deg,var(--brand) 0%, #0a78db 100%);
-      color:#fff;border-radius:20px;padding:20px;box-shadow:var(--shadow);margin:16px 0;
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:'Inter', Arial, sans-serif;
+      background:linear-gradient(180deg,#edf4fb 0%, #f6f8fc 100%);
+      color:var(--text);
     }
-    .hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-    .hero h1{margin:0;font-size:28px}
-    .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:18px;margin:16px 0;
+    .app-shell {
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 40px;
     }
-    .section-title{margin:0 0 14px;font-size:20px;color:var(--brand)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-    label{display:block;font-size:13px;font-weight:700;margin:0 0 6px}
-    input,select,textarea,button{
-      width:100%;padding:12px;border:1px solid #cdd8e5;border-radius:12px;font:inherit
+    .hero {
+      background:linear-gradient(135deg,#0d5cab 0%, #0c7be0 100%);
+      color:#fff;
+      border-radius:24px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      margin-bottom:20px;
     }
-    input[readonly]{background:#f7faff}
-    textarea{min-height:84px;resize:vertical}
-    button{border:none;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
-    button:hover{background:var(--brand-dark)}
-    .btn-secondary{background:#eef5ff;color:var(--brand);border:1px solid #cfe1fb}
-    .btn-secondary:hover{background:#deeeff}
-    .btn-danger{background:#fff1f2;color:var(--bad);border:1px solid #fecdd3}
-    .hidden{display:none}
-    .msg{margin-top:10px;font-size:14px;font-weight:700}
-    .ok{color:var(--ok)}
-    .warn{color:var(--warn)}
-    .err{color:var(--bad)}
-    .progress-wrap{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-    .progress-bar{
-      width:100%;height:12px;background:#dbe8f6;border-radius:999px;overflow:hidden
+    .hero-top {
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+      flex-wrap:wrap;
     }
-    .progress-fill{
-      height:100%;width:0%;background:linear-gradient(90deg,#29a3ff,var(--brand));transition:width .25s ease
+    .brand-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      font-size:13px;
+      margin-bottom:12px;
     }
-    .progress-text{font-weight:700;color:var(--brand)}
-    .score-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-    .score-card{background:#f8fbff;border:1px solid #d6e7fb;border-radius:14px;padding:14px}
-    .score-card h4{margin:0 0 6px;font-size:13px;color:var(--muted)}
-    .score-card .big{font-size:24px;font-weight:800;color:var(--brand)}
-    .section-box{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
-    .question{padding:12px 0;border-bottom:1px dashed #e4edf8}
-    .question:last-child{border-bottom:none}
-    .question-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    .marks{font-size:12px;color:var(--muted);font-weight:700}
-    .options{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
-    .options label{display:flex;align-items:center;gap:6px;margin:0;font-weight:500}
-    .options input{width:auto;padding:0}
-    .photo-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff}
-    .photo-card h4{margin:0 0 10px;font-size:15px}
-    .photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .upload-status{font-size:12px;margin-top:8px;word-break:break-word}
-    .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
-    .preview{background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px}
-    .preview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
-    .preview span{display:block;font-size:11px;color:var(--muted);margin-top:6px}
-    .top-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .top-actions button{max-width:220px}
-    .sticky-submit{
-      position:sticky;bottom:10px;z-index:20;background:rgba(244,247,251,.92);
-      backdrop-filter:blur(8px);padding-top:8px
+    .hero h1 {
+      margin:0;
+      font-size:32px;
+      line-height:1.1;
+      font-weight:800;
     }
-    .small{font-size:12px;color:var(--muted)}
-    @media (max-width:640px){
-      .hero h1{font-size:22px}
-      .photo-actions{grid-template-columns:1fr}
-      .app{padding:12px}
+    .hero p {
+      margin:10px 0 0;
+      max-width:760px;
+      color:rgba(255,255,255,.9);
+      font-size:15px;
+    }
+    .hero-meta {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      gap:12px;
+      width:100%;
+      margin-top:20px;
+    }
+    .meta-card {
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:16px;
+      padding:14px;
+    }
+    .meta-label { font-size:12px; color:rgba(255,255,255,.75); margin-bottom:6px; }
+    .meta-value { font-size:18px; font-weight:700; }
+    .card {
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card + .card { margin-top:18px; }
+    .card-head {
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .card-head h2 { margin:0; font-size:20px; }
+    .card-head p { margin:4px 0 0; font-size:13px; color:var(--muted); }
+    .card-body { padding:20px; }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:14px;
+    }
+    .field { grid-column:span 12; }
+    .field.col-6 { grid-column:span 6; }
+    .field.col-4 { grid-column:span 4; }
+    .field.col-3 { grid-column:span 3; }
+    label {
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:var(--text);
+      margin-bottom:8px;
+    }
+    input, select, textarea, button {
+      font:inherit;
+    }
+    input, select, textarea {
+      width:100%;
+      border:1px solid #cfd9e6;
+      background:#fff;
+      border-radius:12px;
+      padding:12px 14px;
+      color:var(--text);
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color:#7eb6f7;
+      box-shadow:0 0 0 4px rgba(0,102,204,.12);
+    }
+    textarea { min-height:88px; resize:vertical; }
+    .readonly { background:var(--surface-2); }
+    .btn-row { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn {
+      border:none;
+      border-radius:12px;
+      padding:12px 18px;
+      font-weight:700;
+      cursor:pointer;
+      min-height:46px;
+      transition:.2s ease;
+    }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:var(--primary-2); }
+    .btn-secondary { background:#eef4fb; color:var(--primary-2); }
+    .btn-secondary:hover { background:#e3edf8; }
+    .status-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:#eef3f8;
+      color:var(--muted);
+    }
+    .status-success { background:#e9f8ef; color:var(--success); }
+    .status-danger { background:#fff0ef; color:var(--danger); }
+    .hidden { display:none !important; }
+    .section-block {
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+    .section-head {
+      padding:14px 16px;
+      background:#f7fafe;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .section-head h3 { margin:0; font-size:17px; }
+    .section-score { font-size:13px; font-weight:700; color:var(--primary-2); }
+    .criteria-item {
+      padding:16px;
+      border-bottom:1px solid #edf1f5;
+      background:#fff;
+    }
+    .criteria-item:last-child { border-bottom:none; }
+    .criteria-top {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+    .criteria-title { font-weight:700; }
+    .criteria-meta { font-size:12px; color:var(--muted); margin-top:4px; }
+    .option-row {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .option-card {
+      border:1px solid #d6dfeb;
+      border-radius:14px;
+      padding:12px;
+      background:#fbfdff;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .option-card.active {
+      border-color:#7eb6f7;
+      background:#eef6ff;
+      box-shadow:0 0 0 3px rgba(0,102,204,.08);
+    }
+    .option-card input { width:auto; margin-right:8px; }
+    .option-label { font-weight:600; display:flex; align-items:center; }
+    .option-points { font-size:12px; color:var(--muted); margin-top:6px; }
+    .score-panel {
+      position:sticky;
+      bottom:10px;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      margin-top:18px;
+    }
+    .score-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    .score-box {
+      background:#f7fafe;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .score-box .label { font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .score-box .value { font-size:22px; font-weight:800; }
+    .msg {
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      display:none;
+    }
+    .msg.ok { display:block; background:#e9f8ef; color:var(--success); }
+    .msg.err { display:block; background:#fff0ef; color:var(--danger); }
+    .file-note { font-size:12px; color:var(--muted); margin-top:6px; }
+    .preview-frame {
+      width:100%;
+      min-height:420px;
+      border:1px dashed #bfd0e2;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fcfdff 0%, #f5f8fc 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      color:var(--muted);
+      text-align:center;
+    }
+    @media (max-width: 900px) {
+      .hero-meta, .score-grid { grid-template-columns:1fr 1fr; }
+      .field.col-6, .field.col-4, .field.col-3 { grid-column:span 12; }
+    }
+    @media (max-width: 640px) {
+      .app-shell { padding:16px 12px 28px; }
+      .hero h1 { font-size:26px; }
+      .hero-meta, .score-grid { grid-template-columns:1fr; }
+      .card-head { padding:16px; }
+      .card-body { padding:16px; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="hero">
+  <div class="app-shell">
+    <section class="hero">
       <div class="hero-top">
         <div>
-          <h1>Daikin DSP Audit</h1>
+          <div class="brand-badge">Daikin Solution Plaza · Field Audit Application</div>
+          <h1>DSP Audit Execution App</h1>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div id="loginCard" class="card">
-      <h2 class="section-title">Login</h2>
-      <div class="grid">
+    <section class="card" id="loginCard">
+      <div class="card-head">
         <div>
-          <label>Employee ID</label>
-          <input id="employeeId" type="text" placeholder="Enter Employee ID">
+          <h2>User Login</h2>
+          <p>Sign in using employee ID and password from the Users master sheet.</p>
         </div>
+        <span class="status-pill" id="apiStatus">API not checked</span>
+      </div>
+      <div class="card-body">
+        <div class="grid">
+          <div class="field col-6">
+            <label for="employeeId">Employee ID</label>
+            <input type="text" id="employeeId" placeholder="Enter employee ID">
+          </div>
+          <div class="field col-6">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-primary" id="loginBtn">Login</button>
+          <button class="btn btn-secondary" id="pingBtn" type="button">Test API</button>
+        </div>
+        <div id="loginMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="auditCard">
+      <div class="card-head">
         <div>
-          <label>Password</label>
-          <input id="password" type="password" value="Daikin@123" placeholder="Enter Password">
+          <h2>Audit Form</h2>
+          <p>Store selection, location validation, evidence upload, dynamic criteria scoring, and final audit submission.</p>
         </div>
+        <span class="status-pill status-success" id="userBadge">Logged In</span>
       </div>
-      <div class="top-actions" style="margin-top:14px;">
-        <button onclick="login()">Login</button>
-      </div>
-      <div id="loginMsg" class="msg"></div>
-    </div>
-
-    <div id="appCard" class="hidden">
-      <div class="card">
-        <h2 class="section-title">Audit Progress</h2>
-        <div class="progress-wrap">
-          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-          <div id="progressText" class="progress-text">0%</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
-          <h2 class="section-title" style="margin:0;">Audit Details</h2>
-          <button class="btn-danger" style="max-width:150px;" onclick="logout()">Logout</button>
-        </div>
-
+      <div class="card-body">
         <div class="grid">
-          <div>
-            <label>Auditor Name</label>
-            <input id="employeeName" readonly>
-          </div>
-          <div>
-            <label>Role</label>
-            <input id="role" readonly>
-          </div>
-          <div>
-            <label>Audit Date</label>
-            <input id="auditDate" type="date">
-          </div>
-          <div>
-            <label>Audit Time</label>
-            <input id="auditTime" type="time">
-          </div>
-        </div>
-
-        <div class="grid" style="margin-top:14px;">
-          <div>
-            <label>Region</label>
-            <select id="regionSelect" onchange="onRegionChange()">
-              <option value="">Select Region</option>
+          <div class="field col-6">
+            <label for="dspSelect">Select DSP</label>
+            <select id="dspSelect">
+              <option value="">Select mapped DSP</option>
             </select>
           </div>
-          <div>
-            <label>Branch</label>
-            <select id="branchSelect" onchange="onBranchChange()">
-              <option value="">Select Branch</option>
-            </select>
+          <div class="field col-3">
+            <label for="auditDate">Audit Date</label>
+            <input type="date" id="auditDate">
           </div>
-          <div>
-            <label>Search DSP</label>
-            <input id="dspSearch" type="text" placeholder="Search DSP / Dealer / Code" oninput="filterDSPs()">
+          <div class="field col-3">
+            <label for="auditTime">Audit Time</label>
+            <input type="time" id="auditTime">
           </div>
-          <div>
-            <label>DSP Store</label>
-            <select id="dspSelect" onchange="loadStoreDetails()">
-              <option value="">Select DSP</option>
-            </select>
-          </div>
+
+          <div class="field col-4"><label>DSP Code</label><input id="dspCode" class="readonly" readonly></div>
+          <div class="field col-4"><label>Store Name</label><input id="dspName" class="readonly" readonly></div>
+          <div class="field col-4"><label>Dealer Name</label><input id="dealerName" class="readonly" readonly></div>
+          <div class="field col-4"><label>Owner Name</label><input id="ownerName" class="readonly" readonly></div>
+          <div class="field col-4"><label>Owner Number</label><input id="ownerNumber" class="readonly" readonly></div>
+          <div class="field col-4"><label>City</label><input id="city" class="readonly" readonly></div>
+          <div class="field col-3"><label>Pincode</label><input id="pincode" class="readonly" readonly></div>
+          <div class="field col-3"><label>State</label><input id="state" class="readonly" readonly></div>
+          <div class="field col-3"><label>Region</label><input id="region" class="readonly" readonly></div>
+          <div class="field col-3"><label>Branch</label><input id="branch" class="readonly" readonly></div>
+          <div class="field col-6"><label>ASM Name</label><input id="asmName" class="readonly" readonly></div>
+          <div class="field col-6"><label>ISD Deployment</label><input id="isdDeployment" class="readonly" readonly></div>
         </div>
 
-        <div style="margin-top:14px;max-width:280px;">
-          <button onclick="captureLocation()">Capture GPS Location</button>
-        </div>
-        <div id="gpsMsg" class="msg"></div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Store Information</h2>
-        <div class="grid">
-          <div><label>DSP Code</label><input id="dspCode" readonly></div>
-          <div><label>DSP Name</label><input id="dspName" readonly></div>
-          <div><label>Dealer Name</label><input id="dealerName" readonly></div>
-          <div><label>Dealer Number</label><input id="ownerNumber" readonly></div>
-          <div><label>City</label><input id="city" readonly></div>
-          <div><label>Pincode</label><input id="pincode" readonly></div>
-          <div><label>State</label><input id="state" readonly></div>
-          <div><label>ISD Deployment</label><input id="isdDeployment" readonly></div>
-          <div><label>ASM Name</label><input id="asmName" readonly></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Photo Evidence</h2>
-        <div class="small">Shopfront photo is mandatory. For store photos, at least 1 out of 5 is mandatory.</div>
-
-        <div class="photo-grid" style="margin-top:14px;">
-          <div class="photo-card">
-            <h4>Shopfront Photo <span class="err">*</span></h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('shopfront')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('shopfront')">Upload</button>
+        <div class="card" style="margin-top:20px; box-shadow:none;">
+          <div class="card-head">
+            <div>
+              <h2 style="font-size:18px;">Geo Verification</h2>
+              <p>Capture merchandiser location before submission.</p>
             </div>
-            <input id="shopfront_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleShopfrontFile(event)">
-            <input id="shopfront_upload" class="hidden" type="file" accept="image/*" onchange="handleShopfrontFile(event)">
-            <div id="shopfrontMsg" class="upload-status"></div>
+            <span class="status-pill" id="gpsBadge">GPS pending</span>
           </div>
-
-          <div class="photo-card">
-            <h4>Store Photo 1</h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('store1')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('store1')">Upload</button>
+          <div class="card-body">
+            <div class="btn-row">
+              <button class="btn btn-secondary" type="button" id="gpsBtn">Capture GPS</button>
             </div>
-            <input id="store1_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,1)">
-            <input id="store1_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,1)">
-            <div id="storePhoto1Msg" class="upload-status"></div>
-          </div>
-
-          <div class="photo-card">
-            <h4>Store Photo 2</h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('store2')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('store2')">Upload</button>
+            <div class="grid" style="margin-top:14px;">
+              <div class="field col-4"><label>Captured Latitude</label><input id="capturedLatitude" class="readonly" readonly></div>
+              <div class="field col-4"><label>Captured Longitude</label><input id="capturedLongitude" class="readonly" readonly></div>
+              <div class="field col-4"><label>Captured At</label><input id="locationCapturedAt" class="readonly" readonly></div>
             </div>
-            <input id="store2_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,2)">
-            <input id="store2_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,2)">
-            <div id="storePhoto2Msg" class="upload-status"></div>
-          </div>
-
-          <div class="photo-card">
-            <h4>Store Photo 3</h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('store3')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('store3')">Upload</button>
-            </div>
-            <input id="store3_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,3)">
-            <input id="store3_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,3)">
-            <div id="storePhoto3Msg" class="upload-status"></div>
-          </div>
-
-          <div class="photo-card">
-            <h4>Store Photo 4</h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('store4')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('store4')">Upload</button>
-            </div>
-            <input id="store4_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,4)">
-            <input id="store4_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,4)">
-            <div id="storePhoto4Msg" class="upload-status"></div>
-          </div>
-
-          <div class="photo-card">
-            <h4>Store Photo 5</h4>
-            <div class="photo-actions">
-              <button type="button" onclick="openCamera('store5')">Take Photo</button>
-              <button type="button" class="btn-secondary" onclick="openUpload('store5')">Upload</button>
-            </div>
-            <input id="store5_camera" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleStorePhoto(event,5)">
-            <input id="store5_upload" class="hidden" type="file" accept="image/*" onchange="handleStorePhoto(event,5)">
-            <div id="storePhoto5Msg" class="upload-status"></div>
+            <div id="gpsMsg" class="msg"></div>
           </div>
         </div>
 
-        <div class="top-actions" style="margin-top:14px;">
-          <button id="uploadPhotosBtn" onclick="uploadAllPhotos()">Compress & Upload Photos</button>
-        </div>
-        <div id="uploadMsg" class="msg"></div>
-        <div id="photoPreviewGrid" class="preview-grid"></div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Audit Checklist</h2>
-        <div id="auditSections"></div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Section-wise Score</h2>
-        <div id="sectionScoreCards" class="score-row"></div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title">Final Summary</h2>
-        <div class="score-row">
-          <div class="score-card">
-            <h4>Final Score</h4>
-            <div class="big" id="finalScore">0.00</div>
+        <div class="card" style="margin-top:20px; box-shadow:none;">
+          <div class="card-head">
+            <div>
+              <h2 style="font-size:18px;">Photo Evidence</h2>
+              <p>Shopfront is mandatory. Up to 5 additional store photos can be uploaded.</p>
+            </div>
           </div>
-          <div class="score-card">
-            <h4>Compliance %</h4>
-            <div class="big" id="compliancePercent">0.00%</div>
-          </div>
-          <div class="score-card">
-            <h4>Grade</h4>
-            <div class="big" id="grade">Pending</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field col-6">
+                <label for="shopfrontPhoto">Shopfront Photo</label>
+                <input type="file" id="shopfrontPhoto" accept="image/*" capture="environment">
+                <div class="file-note" id="shopfrontNote">Mandatory upload</div>
+              </div>
+              <div class="field col-6">
+                <label for="storePhoto1">Store Photo 1</label>
+                <input type="file" id="storePhoto1" accept="image/*" capture="environment">
+              </div>
+              <div class="field col-6">
+                <label for="storePhoto2">Store Photo 2</label>
+                <input type="file" id="storePhoto2" accept="image/*" capture="environment">
+              </div>
+              <div class="field col-6">
+                <label for="storePhoto3">Store Photo 3</label>
+                <input type="file" id="storePhoto3" accept="image/*" capture="environment">
+              </div>
+              <div class="field col-6">
+                <label for="storePhoto4">Store Photo 4</label>
+                <input type="file" id="storePhoto4" accept="image/*" capture="environment">
+              </div>
+              <div class="field col-6">
+                <label for="storePhoto5">Store Photo 5</label>
+                <input type="file" id="storePhoto5" accept="image/*" capture="environment">
+              </div>
+            </div>
+            <div id="uploadMsg" class="msg"></div>
           </div>
         </div>
 
-        <div style="margin-top:16px;">
-          <label>Overall Remarks</label>
-          <textarea id="overallRemarks" placeholder="Enter comments, issues, missing branding, hygiene observations, staff compliance notes"></textarea>
+        <div class="card" style="margin-top:20px; box-shadow:none;">
+          <div class="card-head">
+            <div>
+              <h2 style="font-size:18px;">Audit Parameters</h2>
+              <p>Criteria are loaded dynamically from CriteriaMaster and OptionMaster.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="criteriaContainer"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="sticky-submit">
-        <div class="card" style="margin-top:0;">
-          <button id="submitAuditBtn" onclick="submitAudit()">Submit Audit</button>
+        <div class="grid" style="margin-top:20px;">
+          <div class="field col-12">
+            <label for="overallRemarks">Overall Remarks</label>
+            <textarea id="overallRemarks" placeholder="Enter remarks or corrective notes"></textarea>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <div class="score-grid">
+            <div class="score-box">
+              <div class="label">Final Score</div>
+              <div class="value" id="finalScore">0.00</div>
+            </div>
+            <div class="score-box">
+              <div class="label">Compliance %</div>
+              <div class="value" id="compliancePercent">0</div>
+            </div>
+            <div class="score-box">
+              <div class="label">Grade</div>
+              <div class="value" id="gradeText">Pending</div>
+            </div>
+            <div class="score-box">
+              <div class="label">Criteria Answered</div>
+              <div class="value" id="answeredCount">0</div>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:16px;">
+            <button class="btn btn-primary" id="submitBtn" type="button">Submit Audit</button>
+            <button class="btn btn-secondary" id="resetBtn" type="button">Reset Form</button>
+          </div>
           <div id="submitMsg" class="msg"></div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <div class="card-head">
+        <div>
+          <h2>Preview</h2>
+          <p>Static layout preview of the same GUI style that will run on GitHub Pages.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="preview-frame">
+          <div>
+            <div style="font-size:18px; font-weight:700; color:#17324d; margin-bottom:10px;">Daikin DSP Audit UI Ready</div>
+            <div style="max-width:560px; line-height:1.6;">This build is connected to your Apps Script backend URL, loads user/store masters dynamically, supports GPS capture, photo uploads to Drive, weighted scoring from master sheets, and direct submission into the AuditData tab.</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbzZAM1wvun0buGXINKeJIuVbCDOd8hN5QBh1pEFzj3KxblwEIBr1B7qbiSjqx-_N9IraQ/exec";
-
-    let currentUser = null;
-    let mappedStores = [];
-    let branchStores = [];
-    let filteredStores = [];
-    let currentStore = null;
-    let criteriaList = [];
-
-    let capturedLatitude = "";
-    let capturedLongitude = "";
-    let locationCapturedAt = "";
-
-    let shopfrontFile = null;
-    let storePhotoFiles = {1:null,2:null,3:null,4:null,5:null};
-
-    let uploadedPhotoUrls = {
-      shopfrontPhotoURL: "",
-      storePhoto1URL: "",
-      storePhoto2URL: "",
-      storePhoto3URL: "",
-      storePhoto4URL: "",
-      storePhoto5URL: ""
-    };
-
-    function setNow() {
-      const now = new Date();
-      document.getElementById("auditDate").value = now.toISOString().split("T")[0];
-      document.getElementById("auditTime").value = now.toTimeString().slice(0,5);
-    }
-
-    async function parseResponse(res) {
-      const text = await res.text();
-      try { return JSON.parse(text); }
-      catch(e) { return { success:false, message:"Invalid API response", raw:text }; }
-    }
-
-    async function login() {
-      const employeeId = document.getElementById("employeeId").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("loginMsg");
-      msg.innerHTML = "";
-
-      if (!employeeId || !password) {
-        msg.innerHTML = `<span class="err">Enter Employee ID and Password.</span>`;
-        return;
-      }
-
-      try {
-        const url = `${API_BASE}?action=login&employeeId=${encodeURIComponent(employeeId)}&password=${encodeURIComponent(password)}`;
-        const res = await fetch(url);
-        const data = await parseResponse(res);
-
-        if (!data.success) {
-          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Login failed")}</span>`;
-          return;
-        }
-
-        currentUser = data.user || {};
-        mappedStores = data.stores || [];
-        criteriaList = data.criteria || [];
-
-        document.getElementById("employeeName").value = currentUser.EmployeeName || "";
-        document.getElementById("role").value = currentUser.Role || "";
-
-        populateRegions();
-        renderCriteria();
-        renderSectionScoreCards();
-        setNow();
-        updateProgress();
-
-        document.getElementById("loginCard").classList.add("hidden");
-        document.getElementById("appCard").classList.remove("hidden");
-      } catch (err) {
-        msg.innerHTML = `<span class="err">Unable to connect to server.</span>`;
-      }
-    }
-
-    function logout() { location.reload(); }
-
-    function populateRegions() {
-      const regions = [...new Set(mappedStores.map(s => (s.Region || "").trim()).filter(Boolean))].sort();
-      const sel = document.getElementById("regionSelect");
-      sel.innerHTML = `<option value="">Select Region</option>`;
-      regions.forEach(r => sel.innerHTML += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`);
-    }
-
-    function onRegionChange() {
-      const region = document.getElementById("regionSelect").value;
-      const branches = [...new Set(mappedStores.filter(s => (s.Region || "").trim() === region).map(s => (s.Branch || "").trim()).filter(Boolean))].sort();
-      const branchSel = document.getElementById("branchSelect");
-      branchSel.innerHTML = `<option value="">Select Branch</option>`;
-      branches.forEach(b => branchSel.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`);
-      document.getElementById("dspSelect").innerHTML = `<option value="">Select DSP</option>`;
-      document.getElementById("dspSearch").value = "";
-      branchStores = [];
-      filteredStores = [];
-      clearStoreDetails();
-      resetLocation();
-      updateProgress();
-    }
-
-    function onBranchChange() {
-      const region = document.getElementById("regionSelect").value;
-      const branch = document.getElementById("branchSelect").value;
-      branchStores = mappedStores.filter(s => (s.Region || "").trim() === region && (s.Branch || "").trim() === branch);
-      filteredStores = [...branchStores];
-      populateDSPDropdown(filteredStores);
-      clearStoreDetails();
-      resetLocation();
-      updateProgress();
-    }
-
-    function filterDSPs() {
-      const keyword = document.getElementById("dspSearch").value.trim().toLowerCase();
-      filteredStores = !keyword ? [...branchStores] : branchStores.filter(s => {
-        const code = (s.DSPCode || "").toLowerCase();
-        const name = (s.DSPName || "").toLowerCase();
-        const dealer = (s.DealerName || "").toLowerCase();
-        return code.includes(keyword) || name.includes(keyword) || dealer.includes(keyword);
-      });
-      populateDSPDropdown(filteredStores);
-      clearStoreDetails();
-      resetLocation();
-      updateProgress();
-    }
-
-    function populateDSPDropdown(stores) {
-      const sel = document.getElementById("dspSelect");
-      sel.innerHTML = `<option value="">Select DSP</option>`;
-      stores.forEach((store, idx) => {
-        sel.innerHTML += `<option value="${idx}">${escapeHtml(store.DSPCode)} - ${escapeHtml(store.DSPName)}</option>`;
-      });
-    }
-
-    function loadStoreDetails() {
-      const idx = document.getElementById("dspSelect").value;
-      currentStore = filteredStores[idx] || null;
-      const setVal = (id, val) => document.getElementById(id).value = val || "";
-      setVal("dspCode", currentStore?.DSPCode);
-      setVal("dspName", currentStore?.DSPName);
-      setVal("dealerName", currentStore?.DealerName);
-      setVal("ownerNumber", currentStore?.OwnerNumber);
-      setVal("city", currentStore?.City);
-      setVal("pincode", currentStore?.Pincode);
-      setVal("state", currentStore?.State);
-      setVal("isdDeployment", currentStore?.ISDDeployment);
-      setVal("asmName", currentStore?.ASMName);
-      resetLocation();
-      updateProgress();
-    }
-
-    function clearStoreDetails() {
-      currentStore = null;
-      ["dspCode","dspName","dealerName","ownerNumber","city","pincode","state","isdDeployment","asmName"]
-        .forEach(id => document.getElementById(id).value = "");
-    }
-
-    function resetLocation() {
-      capturedLatitude = "";
-      capturedLongitude = "";
-      locationCapturedAt = "";
-      document.getElementById("gpsMsg").innerHTML = "";
-    }
-
-    function captureLocation() {
-      const msg = document.getElementById("gpsMsg");
-      if (!currentStore) {
-        msg.innerHTML = `<span class="err">Please select DSP before capturing location.</span>`;
-        return;
-      }
-      if (!navigator.geolocation) {
-        msg.innerHTML = `<span class="err">Geolocation is not supported in this browser.</span>`;
-        return;
-      }
-      msg.innerHTML = `<span class="warn">Capturing location...</span>`;
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          capturedLatitude = pos.coords.latitude.toFixed(6);
-          capturedLongitude = pos.coords.longitude.toFixed(6);
-          locationCapturedAt = new Date().toISOString();
-          msg.innerHTML = `<span class="ok">Location captured: ${capturedLatitude}, ${capturedLongitude}</span>`;
-          updateProgress();
-        },
-        () => {
-          msg.innerHTML = `<span class="err">Unable to capture location. Please allow GPS permission.</span>`;
-        },
-        { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-      );
-    }
-
-    function openCamera(prefix) {
-      const el = document.getElementById(`${prefix}_camera`);
-      if (el) el.click();
-    }
-
-    function openUpload(prefix) {
-      const el = document.getElementById(`${prefix}_upload`);
-      if (el) el.click();
-    }
-
-    function handleShopfrontFile(e) {
-      shopfrontFile = e.target.files[0] || null;
-      uploadedPhotoUrls.shopfrontPhotoURL = "";
-      document.getElementById("shopfrontMsg").innerHTML = shopfrontFile
-        ? `<span class="ok">${escapeHtml(shopfrontFile.name)}</span>`
-        : `<span class="err">Shopfront photo required</span>`;
-      renderPreviews();
-      updateProgress();
-    }
-
-    function handleStorePhoto(e, slotNo) {
-      storePhotoFiles[slotNo] = e.target.files[0] || null;
-      uploadedPhotoUrls[`storePhoto${slotNo}URL`] = "";
-      const msg = document.getElementById(`storePhoto${slotNo}Msg`);
-      msg.innerHTML = storePhotoFiles[slotNo]
-        ? `<span class="ok">${escapeHtml(storePhotoFiles[slotNo].name)}</span>`
-        : `<span class="warn">No file selected</span>`;
-      renderPreviews();
-      updateProgress();
-    }
-
-    function hasAtLeastOneStorePhoto() {
-      return Object.values(storePhotoFiles).some(Boolean);
-    }
-
-    function renderPreviews() {
-      const grid = document.getElementById("photoPreviewGrid");
-      grid.innerHTML = "";
-
-      if (shopfrontFile) {
-        grid.innerHTML += previewHtml(shopfrontFile, "Shopfront");
-      }
-      for (let i = 1; i <= 5; i++) {
-        if (storePhotoFiles[i]) {
-          grid.innerHTML += previewHtml(storePhotoFiles[i], `Store Photo ${i}`);
-        }
-      }
-    }
-
-    function previewHtml(file, title) {
-      const url = URL.createObjectURL(file);
-      return `
-        <div class="preview">
-          <img src="${url}" alt="${escapeHtml(title)}">
-          <span>${escapeHtml(title)}: ${escapeHtml(file.name)}</span>
-        </div>
-      `;
-    }
-
-    function renderCriteria() {
-      const root = document.getElementById("auditSections");
-      root.innerHTML = "";
-      const grouped = {};
-
-      criteriaList.forEach(c => {
-        if (!grouped[c.SectionName]) grouped[c.SectionName] = [];
-        grouped[c.SectionName].push(c);
-      });
-
-      Object.keys(grouped).forEach(section => {
-        const box = document.createElement("div");
-        box.className = "section-box";
-        box.innerHTML = `<h3 style="margin:0 0 12px;color:var(--brand);">${escapeHtml(section)}</h3>`;
-
-        grouped[section].forEach((c, idx) => {
-          const uid = `crit_${idx}_${c.CriteriaID}`;
-          const q = document.createElement("div");
-          q.className = "question";
-          q.dataset.criteriaid = c.CriteriaID;
-          q.dataset.sectionname = c.SectionName;
-          q.dataset.parametername = c.ParameterName;
-          q.dataset.weightage = Number(c.Weightage || 0);
-
-          let opts = "";
-          (c.Options || []).forEach(opt => {
-            opts += `
-              <label>
-                <input type="radio"
-                       name="${uid}"
-                       value="${Number(opt.OptionPoints || 0)}"
-                       data-label="${escapeHtml(opt.OptionLabel)}"
-                       onchange="calculateScore()">
-                ${escapeHtml(opt.OptionLabel)}
-              </label>`;
-          });
-
-          q.innerHTML = `
-            <div class="question-head">
-              <div><strong>${escapeHtml(c.ParameterName)}</strong></div>
-              <div class="marks">Weightage: ${Number(c.Weightage || 0).toFixed(2)}</div>
-            </div>
-            <div class="options">${opts}</div>
-          `;
-          box.appendChild(q);
-        });
-
-        root.appendChild(box);
-      });
-    }
-
-    function renderSectionScoreCards() {
-      const sections = [...new Set(criteriaList.map(c => c.SectionName).filter(Boolean))];
-      const root = document.getElementById("sectionScoreCards");
-      root.innerHTML = "";
-      sections.forEach(sec => {
-        const id = slugify(sec);
-        root.innerHTML += `
-          <div class="score-card">
-            <h4>${escapeHtml(sec)}</h4>
-            <div class="big" id="section_${id}">0.00</div>
-          </div>
-        `;
-      });
-    }
-
-    function calculateScore() {
-      const questions = [...document.querySelectorAll(".question")];
-      let total = 0;
-      let maxTotal = 0;
-      const sectionScores = {};
-
-      questions.forEach(q => {
-        const sec = q.dataset.sectionname || "";
-        const weight = Number(q.dataset.weightage || 0);
-        const sel = q.querySelector("input[type='radio']:checked");
-
-        maxTotal += weight;
-        if (!sectionScores[sec]) sectionScores[sec] = 0;
-
-        if (sel) {
-          const points = Number(sel.value || 0);
-          const weighted = weight * points;
-          total += weighted;
-          sectionScores[sec] += weighted;
-        }
-      });
-
-      Object.keys(sectionScores).forEach(sec => {
-        const id = `section_${slugify(sec)}`;
-        const el = document.getElementById(id);
-        if (el) el.textContent = sectionScores[sec].toFixed(2);
-      });
-
-      const compliance = maxTotal ? (total / maxTotal) * 100 : 0;
-      let grade = "Needs Improvement";
-      if (compliance >= 90) grade = "Excellent";
-      else if (compliance >= 80) grade = "Good";
-      else if (compliance >= 70) grade = "Average";
-
-      document.getElementById("finalScore").textContent = total.toFixed(2);
-      document.getElementById("compliancePercent").textContent = compliance.toFixed(2) + "%";
-      document.getElementById("grade").textContent = grade;
-
-      updateProgress();
-    }
-
-    function getResponsesJSON() {
-      const questions = [...document.querySelectorAll(".question")];
-      const rows = [];
-
-      for (const q of questions) {
-        const sel = q.querySelector("input[type='radio']:checked");
-        if (!sel) {
-          return { ok:false, message:"Please answer all checklist items." };
-        }
-
-        const weight = Number(q.dataset.weightage || 0);
-        const pts = Number(sel.value || 0);
-
-        rows.push({
-          CriteriaID: q.dataset.criteriaid,
-          SectionName: q.dataset.sectionname,
-          ParameterName: q.dataset.parametername,
-          Weightage: weight,
-          SelectedOption: sel.dataset.label || "",
-          SelectedPoints: pts,
-          WeightedScore: Number((weight * pts).toFixed(2))
-        });
-      }
-
-      return { ok:true, data:rows };
-    }
-
-    async function compressImage(file, maxWidth = 1600, quality = 0.75) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const reader = new FileReader();
-
-        reader.onload = e => {
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            let { width, height } = img;
-
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob(blob => resolve(blob), "image/jpeg", quality);
-          };
-          img.src = e.target.result;
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(",")[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function uploadSingleFile(file, label) {
-      const compressed = await compressImage(file);
-      const base64Data = await blobToBase64(compressed);
-
-      const params = new URLSearchParams();
-      params.append("action", "uploadImage");
-      params.append("fileName", `${Date.now()}_${file.name}`.replace(/\s+/g, "_"));
-      params.append("mimeType", "image/jpeg");
-      params.append("base64Data", base64Data);
-
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
-      });
-
-      const data = await parseResponse(res);
-      if (!data.success) throw new Error(data.message || `${label} upload failed`);
-      return data.fileUrl;
-    }
-
-    async function uploadAllPhotos() {
-      const msg = document.getElementById("uploadMsg");
-      msg.innerHTML = "";
-
-      if (!shopfrontFile) {
-        msg.innerHTML = `<span class="err">Shopfront photo is mandatory.</span>`;
-        return false;
-      }
-      if (!hasAtLeastOneStorePhoto()) {
-        msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
-        return false;
-      }
-
-      try {
-        document.getElementById("uploadPhotosBtn").disabled = true;
-        msg.innerHTML = `<span class="warn">Uploading photos...</span>`;
-
-        if (shopfrontFile && !uploadedPhotoUrls.shopfrontPhotoURL) {
-          uploadedPhotoUrls.shopfrontPhotoURL = await uploadSingleFile(shopfrontFile, "Shopfront");
-        }
-
-        for (let i = 1; i <= 5; i++) {
-          const file = storePhotoFiles[i];
-          const key = `storePhoto${i}URL`;
-          if (file && !uploadedPhotoUrls[key]) {
-            uploadedPhotoUrls[key] = await uploadSingleFile(file, `Store Photo ${i}`);
-          }
-        }
-
-        msg.innerHTML = `<span class="ok">Photos uploaded successfully.</span>`;
-        updateProgress();
-        return true;
-      } catch (e) {
-        msg.innerHTML = `<span class="err">${escapeHtml(e.message || "Photo upload failed")}</span>`;
-        return false;
-      } finally {
-        document.getElementById("uploadPhotosBtn").disabled = false;
-      }
-    }
-
-    async function submitAudit() {
-      const msg = document.getElementById("submitMsg");
-      msg.innerHTML = "";
-
-      if (!currentStore) {
-        msg.innerHTML = `<span class="err">Please select DSP store.</span>`;
-        return;
-      }
-      if (!capturedLatitude || !capturedLongitude) {
-        msg.innerHTML = `<span class="err">Please capture GPS location before submit.</span>`;
-        return;
-      }
-      if (!shopfrontFile) {
-        msg.innerHTML = `<span class="err">Shopfront photo is mandatory.</span>`;
-        return;
-      }
-      if (!hasAtLeastOneStorePhoto()) {
-        msg.innerHTML = `<span class="err">At least 1 store photo is mandatory.</span>`;
-        return;
-      }
-
-      const checklist = getResponsesJSON();
-      if (!checklist.ok) {
-        msg.innerHTML = `<span class="err">${escapeHtml(checklist.message)}</span>`;
-        return;
-      }
-
-      const uploaded = await uploadAllPhotos();
-      if (!uploaded) return;
-
-      try {
-        document.getElementById("submitAuditBtn").disabled = true;
-        msg.innerHTML = `<span class="warn">Submitting audit...</span>`;
-
-        const params = new URLSearchParams();
-        params.append("action", "submitAudit");
-        params.append("auditDate", document.getElementById("auditDate").value);
-        params.append("auditTime", document.getElementById("auditTime").value);
-        params.append("employeeId", currentUser.EmployeeID || "");
-        params.append("employeeName", currentUser.EmployeeName || "");
-        params.append("role", currentUser.Role || "");
-        params.append("region", document.getElementById("regionSelect").value || "");
-        params.append("branch", document.getElementById("branchSelect").value || "");
-        params.append("dspCode", currentStore.DSPCode || "");
-        params.append("dspName", currentStore.DSPName || "");
-        params.append("dealerName", currentStore.DealerName || "");
-        params.append("ownerName", currentStore.OwnerName || "");
-        params.append("ownerNumber", currentStore.OwnerNumber || "");
-        params.append("city", currentStore.City || "");
-        params.append("pincode", currentStore.Pincode || "");
-        params.append("state", currentStore.State || "");
-        params.append("isdDeployment", currentStore.ISDDeployment || "");
-        params.append("asmName", currentStore.ASMName || "");
-        params.append("capturedLatitude", capturedLatitude);
-        params.append("capturedLongitude", capturedLongitude);
-        params.append("locationCapturedAt", locationCapturedAt);
-        params.append("shopfrontPhotoURL", uploadedPhotoUrls.shopfrontPhotoURL || "");
-        params.append("storePhoto1URL", uploadedPhotoUrls.storePhoto1URL || "");
-        params.append("storePhoto2URL", uploadedPhotoUrls.storePhoto2URL || "");
-        params.append("storePhoto3URL", uploadedPhotoUrls.storePhoto3URL || "");
-        params.append("storePhoto4URL", uploadedPhotoUrls.storePhoto4URL || "");
-        params.append("storePhoto5URL", uploadedPhotoUrls.storePhoto5URL || "");
-        params.append("finalScore", document.getElementById("finalScore").textContent || "0");
-        params.append("compliancePercent", (document.getElementById("compliancePercent").textContent || "0").replace("%",""));
-        params.append("grade", document.getElementById("grade").textContent || "");
-        params.append("overallRemarks", document.getElementById("overallRemarks").value || "");
-        params.append("responsesJSON", JSON.stringify(checklist.data));
-
-        const res = await fetch(API_BASE, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: params.toString()
-        });
-
-        const data = await parseResponse(res);
-
-        if (!data.success) {
-          msg.innerHTML = `<span class="err">${escapeHtml(data.message || "Submit failed")}</span>`;
-          return;
-        }
-
-        msg.innerHTML = `<span class="ok">Audit submitted successfully. Audit ID: ${escapeHtml(data.auditId || "")}</span>`;
-        updateProgress(true);
-      } catch (e) {
-        msg.innerHTML = `<span class="err">Unable to submit audit.</span>`;
-      } finally {
-        document.getElementById("submitAuditBtn").disabled = false;
-      }
-    }
-
-    function updateProgress(forceComplete = false) {
-      let completed = 0;
-      let total = 5;
-
-      if (currentStore) completed++;
-      if (capturedLatitude && capturedLongitude) completed++;
-      if (shopfrontFile) completed++;
-      if (hasAtLeastOneStorePhoto()) completed++;
-
-      const questions = [...document.querySelectorAll(".question")];
-      if (questions.length) {
-        const answered = questions.filter(q => q.querySelector("input[type='radio']:checked")).length;
-        if (answered === questions.length) completed++;
-      }
-
-      let pct = Math.round((completed / total) * 100);
-      if (forceComplete) pct = 100;
-
-      document.getElementById("progressFill").style.width = pct + "%";
-      document.getElementById("progressText").textContent = pct + "%";
-    }
-
-    function slugify(s) {
-      return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "_");
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
+
