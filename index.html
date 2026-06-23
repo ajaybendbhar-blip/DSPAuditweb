@@ -19,7 +19,6 @@
       --primary-2:#004f9e;
       --success:#14804a;
       --danger:#c53b32;
-      --warning:#d97706;
       --shadow:0 10px 30px rgba(14,32,61,.08);
       --radius:18px;
     }
@@ -43,50 +42,12 @@
       box-shadow:var(--shadow);
       margin-bottom:20px;
     }
-    .hero-top {
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-    .brand-badge {
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.12);
-      font-size:13px;
-      margin-bottom:12px;
-    }
     .hero h1 {
       margin:0;
       font-size:32px;
       line-height:1.1;
       font-weight:800;
     }
-    .hero p {
-      margin:10px 0 0;
-      max-width:760px;
-      color:rgba(255,255,255,.9);
-      font-size:15px;
-    }
-    .hero-meta {
-      display:grid;
-      grid-template-columns:repeat(3,minmax(120px,1fr));
-      gap:12px;
-      width:100%;
-      margin-top:20px;
-    }
-    .meta-card {
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:16px;
-      padding:14px;
-    }
-    .meta-label { font-size:12px; color:rgba(255,255,255,.75); margin-bottom:6px; }
-    .meta-value { font-size:18px; font-weight:700; }
     .card {
       background:var(--surface);
       border:1px solid var(--line);
@@ -258,7 +219,6 @@
     }
     .msg.ok { display:block; background:#e9f8ef; color:var(--success); }
     .msg.err { display:block; background:#fff0ef; color:var(--danger); }
-    .file-note { font-size:12px; color:var(--muted); margin-top:6px; }
     .preview-frame {
       width:100%;
       min-height:420px;
@@ -273,13 +233,13 @@
       text-align:center;
     }
     @media (max-width: 900px) {
-      .hero-meta, .score-grid { grid-template-columns:1fr 1fr; }
+      .score-grid { grid-template-columns:1fr 1fr; }
       .field.col-6, .field.col-4, .field.col-3 { grid-column:span 12; }
     }
     @media (max-width: 640px) {
       .app-shell { padding:16px 12px 28px; }
       .hero h1 { font-size:26px; }
-      .hero-meta, .score-grid { grid-template-columns:1fr; }
+      .score-grid { grid-template-columns:1fr; }
       .card-head { padding:16px; }
       .card-body { padding:16px; }
     }
@@ -288,12 +248,7 @@
 <body>
   <div class="app-shell">
     <section class="hero">
-      <div class="hero-top">
-        <div>
-          <div class="brand-badge">Daikin Solution Plaza · Field Audit Application</div>
-          <h1>DSP Audit Execution App</h1>
-        </div>
-      </div>
+      <h1>DSP Audit App</h1>
     </section>
 
     <section class="card" id="loginCard">
@@ -302,7 +257,6 @@
           <h2>User Login</h2>
           <p>Sign in using employee ID and password from the Users master sheet.</p>
         </div>
-        <span class="status-pill" id="apiStatus">API not checked</span>
       </div>
       <div class="card-body">
         <div class="grid">
@@ -367,7 +321,6 @@
               <h2 style="font-size:18px;">Geo Verification</h2>
               <p>Capture merchandiser location before submission.</p>
             </div>
-            <span class="status-pill" id="gpsBadge">GPS pending</span>
           </div>
           <div class="card-body">
             <div class="btn-row">
@@ -394,7 +347,6 @@
               <div class="field col-6">
                 <label for="shopfrontPhoto">Shopfront Photo</label>
                 <input type="file" id="shopfrontPhoto" accept="image/*" capture="environment">
-                <div class="file-note" id="shopfrontNote">Mandatory upload</div>
               </div>
               <div class="field col-6">
                 <label for="storePhoto1">Store Photo 1</label>
@@ -467,9 +419,33 @@
         </div>
       </div>
     </section>
-</div>
-  <script src="app.js"></script>
+  </div>
+
+  <script>
+const API_BASE = 'https://script.google.com/macros/s/AKfycbxy8EezZMRnxhDsW9FZTW2d19EZuunPPCCa5rA3PXgUE0L5kaNnqilUHBhLYyVkJxBMMA/exec';
+const state={user:null,stores:[],criteria:[],grades:[],selectedStore:null,responses:{},uploadedUrls:{shopfrontPhotoURL:'',storePhoto1URL:'',storePhoto2URL:'',storePhoto3URL:'',storePhoto4URL:'',storePhoto5URL:''},gps:{lat:'',lng:'',capturedAt:''}};
+const $=id=>document.getElementById(id);
+const els={loginCard:$("loginCard"),auditCard:$("auditCard"),employeeId:$("employeeId"),password:$("password"),loginBtn:$("loginBtn"),loginMsg:$("loginMsg"),dspSelect:$("dspSelect"),auditDate:$("auditDate"),auditTime:$("auditTime"),dspCode:$("dspCode"),dspName:$("dspName"),dealerName:$("dealerName"),ownerName:$("ownerName"),ownerNumber:$("ownerNumber"),city:$("city"),pincode:$("pincode"),state:$("state"),region:$("region"),branch:$("branch"),asmName:$("asmName"),isdDeployment:$("isdDeployment"),gpsBtn:$("gpsBtn"),gpsBadge:$("gpsBadge"),gpsMsg:$("gpsMsg"),capturedLatitude:$("capturedLatitude"),capturedLongitude:$("capturedLongitude"),locationCapturedAt:$("locationCapturedAt"),criteriaContainer:$("criteriaContainer"),finalScore:$("finalScore"),compliancePercent:$("compliancePercent"),gradeText:$("gradeText"),answeredCount:$("answeredCount"),overallRemarks:$("overallRemarks"),submitBtn:$("submitBtn"),resetBtn:$("resetBtn"),submitMsg:$("submitMsg"),uploadMsg:$("uploadMsg"),shopfrontPhoto:$("shopfrontPhoto"),storePhoto1:$("storePhoto1"),storePhoto2:$("storePhoto2"),storePhoto3:$("storePhoto3"),storePhoto4:$("storePhoto4"),storePhoto5:$("storePhoto5")};
+const photos=[{id:'shopfrontPhoto',key:'shopfrontPhotoURL',req:true},{id:'storePhoto1',key:'storePhoto1URL'},{id:'storePhoto2',key:'storePhoto2URL'},{id:'storePhoto3',key:'storePhoto3URL'},{id:'storePhoto4',key:'storePhoto4URL'},{id:'storePhoto5',key:'storePhoto5URL'}];
+document.addEventListener('DOMContentLoaded',()=>{const n=new Date();els.auditDate.value=n.toISOString().slice(0,10);els.auditTime.value=n.toTimeString().slice(0,5);bind();});
+function bind(){els.loginBtn.onclick=login;els.dspSelect.onchange=storeChange;els.gpsBtn.onclick=gps;els.submitBtn.onclick=submit;els.resetBtn.onclick=reset;}
+async function login(){const employeeId=els.employeeId.value.trim(),password=els.password.value.trim();if(!employeeId||!password)return msg(els.loginMsg,'Enter employee ID and password.','err');els.loginBtn.disabled=true;els.loginBtn.textContent='Logging in...';try{const u=API_BASE+'?action=login&employeeId='+encodeURIComponent(employeeId)+'&password='+encodeURIComponent(password);const d=await jget(u);if(!d.success)throw new Error(d.message||'Login failed');state.user=d.user;state.stores=d.stores||[];state.criteria=d.criteria||[];state.grades=d.grades||[];els.loginCard.classList.add('hidden');els.auditCard.classList.remove('hidden');renderStores();renderCriteria();score();msg(els.submitMsg,'Login successful. Audit form is ready.','ok');}catch(e){msg(els.loginMsg,e.message,'err');}finally{els.loginBtn.disabled=false;els.loginBtn.textContent='Login';}}
+function renderStores(){els.dspSelect.innerHTML='<option value="">Select mapped DSP</option>';state.stores.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(s.DSPCode||'')+' - '+(s.DSPName||'')+' ('+(s.City||'')+')';els.dspSelect.appendChild(o);});}
+function storeChange(){const s=state.stores[Number(els.dspSelect.value)]||null;state.selectedStore=s;[['dspCode','DSPCode'],['dspName','DSPName'],['dealerName','DealerName'],['ownerName','OwnerName'],['ownerNumber','OwnerNumber'],['city','City'],['pincode','Pincode'],['state','State'],['region','Region'],['branch','Branch'],['asmName','ASMName'],['isdDeployment','ISDDeployment']].forEach(([a,b])=>$(a).value=s?s[b]||'':'');}
+function renderCriteria(){const grouped={};state.criteria.forEach(c=>{(grouped[c.SectionName]=grouped[c.SectionName]||[]).push(c);});els.criteriaContainer.innerHTML='';Object.keys(grouped).forEach(sec=>{const wrap=document.createElement('div');wrap.className='section-block';wrap.innerHTML='<div class="section-head"><h3>'+esc(sec)+'</h3><div class="section-score" id="sectionScore_'+slug(sec)+'">0.00</div></div><div class="section-body"></div>';const body=wrap.querySelector('.section-body');grouped[sec].forEach(item=>{const itemDiv=document.createElement('div');itemDiv.className='criteria-item';itemDiv.innerHTML='<div class="criteria-top"><div><div class="criteria-title">'+esc(item.ParameterName)+'</div><div class="criteria-meta">Weightage: '+Number(item.Weightage).toFixed(2)+' · Photo Required: '+esc(item.PhotoRequired||'No')+'</div></div><div class="criteria-meta">Criteria ID: '+esc(item.CriteriaID)+'</div></div><div class="option-row">'+(item.Options||[]).map(opt=>'<label class="option-card" data-criteria="'+item.CriteriaID+'" data-optionid="'+opt.OptionID+'" data-points="'+opt.OptionPoints+'"><div class="option-label"><input type="radio" name="criteria_'+item.CriteriaID+'" value="'+opt.OptionID+'"><span>'+esc(opt.OptionLabel)+'</span></div><div class="option-points">Points: '+opt.OptionPoints+'</div></label>').join('')+'</div>';body.appendChild(itemDiv);});els.criteriaContainer.appendChild(wrap);});document.querySelectorAll('.option-card').forEach(card=>card.onclick=()=>{const cid=card.dataset.criteria,oid=card.dataset.optionid,pts=Number(card.dataset.points||0),c=state.criteria.find(x=>x.CriteriaID===cid),o=c?.Options?.find(x=>x.OptionID===oid);state.responses[cid]={CriteriaID:cid,ParameterName:c?.ParameterName||'',SectionName:c?.SectionName||'',Weightage:Number(c?.Weightage||0),SelectedOptionID:oid,SelectedOption:o?.OptionLabel||'',SelectedPoints:pts,WeightedScore:Number((((pts||0)/10)*Number(c?.Weightage||0)*10).toFixed(2))};document.querySelectorAll('.option-card[data-criteria="'+cid+'"]').forEach(x=>x.classList.remove('active'));card.classList.add('active');const r=card.querySelector('input');if(r)r.checked=true;score();});}
+function score(){const res=Object.values(state.responses);const final=res.reduce((s,r)=>s+Number(r.WeightedScore||0),0);const pct=Number((final*10).toFixed(0));const grade=(state.grades.find(g=>pct>=Number(g.CompliancePercentFrom)&&pct<=Number(g.CompliancePercentTo))||{}).GradeName||'Pending';els.finalScore.textContent=final.toFixed(2);els.compliancePercent.textContent=pct+'%';els.gradeText.textContent=grade;els.answeredCount.textContent=res.length;document.querySelectorAll('[id^="sectionScore_"]').forEach(el=>el.textContent='0.00');const gs={};res.forEach(r=>gs[r.SectionName]=(gs[r.SectionName]||0)+Number(r.WeightedScore||0));Object.keys(gs).forEach(sec=>{const el=$('sectionScore_'+slug(sec));if(el)el.textContent=gs[sec].toFixed(2);});}
+function gps(){if(!navigator.geolocation)return msg(els.gpsMsg,'Geolocation is not supported on this device.','err');els.gpsBtn.disabled=true;els.gpsBtn.textContent='Capturing...';navigator.geolocation.getCurrentPosition(p=>{state.gps.lat=String(p.coords.latitude);state.gps.lng=String(p.coords.longitude);state.gps.capturedAt=new Date().toLocaleString();els.capturedLatitude.value=state.gps.lat;els.capturedLongitude.value=state.gps.lng;els.locationCapturedAt.value=state.gps.capturedAt;els.gpsBadge.textContent='GPS captured';els.gpsBadge.className='status-pill status-success';msg(els.gpsMsg,'GPS captured successfully.','ok');els.gpsBtn.disabled=false;els.gpsBtn.textContent='Capture GPS';},e=>{msg(els.gpsMsg,e.message||'Unable to capture GPS.','err');els.gpsBadge.textContent='GPS failed';els.gpsBadge.className='status-pill status-danger';els.gpsBtn.disabled=false;els.gpsBtn.textContent='Capture GPS';},{enableHighAccuracy:true,timeout:15000,maximumAge:0});}
+async function submit(){if(!state.user)return msg(els.submitMsg,'Please login first.','err');if(!state.selectedStore)return msg(els.submitMsg,'Please select a DSP store.','err');if(!state.gps.lat||!state.gps.lng)return msg(els.submitMsg,'Please capture GPS before submission.','err');if(Object.keys(state.responses).length!==state.criteria.length)return msg(els.submitMsg,'Please answer all audit criteria before submission.','err');els.submitBtn.disabled=true;els.submitBtn.textContent='Uploading photos...';try{await uploadPhotos();if(!state.uploadedUrls.shopfrontPhotoURL)throw new Error('Shopfront photo is mandatory.');els.submitBtn.textContent='Submitting audit...';const p=new URLSearchParams();p.append('action','submitAudit');p.append('auditDate',els.auditDate.value);p.append('auditTime',els.auditTime.value);p.append('employeeId',state.user.EmployeeID||'');p.append('employeeName',state.user.EmployeeName||'');p.append('role',state.user.Role||'');p.append('region',state.selectedStore.Region||state.user.Region||'');p.append('branch',state.selectedStore.Branch||state.user.Branch||'');p.append('dspCode',state.selectedStore.DSPCode||'');p.append('dspName',state.selectedStore.DSPName||'');p.append('dealerName',state.selectedStore.DealerName||'');p.append('ownerName',state.selectedStore.OwnerName||'');p.append('ownerNumber',state.selectedStore.OwnerNumber||'');p.append('city',state.selectedStore.City||'');p.append('pincode',state.selectedStore.Pincode||'');p.append('state',state.selectedStore.State||'');p.append('isdDeployment',state.selectedStore.ISDDeployment||'');p.append('asmName',state.selectedStore.ASMName||'');p.append('capturedLatitude',state.gps.lat||'');p.append('capturedLongitude',state.gps.lng||'');p.append('locationCapturedAt',state.gps.capturedAt||'');p.append('shopfrontPhotoURL',state.uploadedUrls.shopfrontPhotoURL||'');p.append('storePhoto1URL',state.uploadedUrls.storePhoto1URL||'');p.append('storePhoto2URL',state.uploadedUrls.storePhoto2URL||'');p.append('storePhoto3URL',state.uploadedUrls.storePhoto3URL||'');p.append('storePhoto4URL',state.uploadedUrls.storePhoto4URL||'');p.append('storePhoto5URL',state.uploadedUrls.storePhoto5URL||'');p.append('finalScore',$('finalScore').textContent);p.append('compliancePercent',$('compliancePercent').textContent.replace('%',''));p.append('grade',$('gradeText').textContent);p.append('overallRemarks',els.overallRemarks.value.trim());p.append('responsesJSON',JSON.stringify(Object.values(state.responses)));const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||'Submission failed');msg(els.submitMsg,'Audit submitted successfully. Audit ID: '+d.auditId,'ok');}catch(e){msg(els.submitMsg,e.message,'err');}finally{els.submitBtn.disabled=false;els.submitBtn.textContent='Submit Audit';}}
+async function uploadPhotos(){for(const f of photos){const input=$(f.id),file=input.files&&input.files[0];if(!file){if(f.req)throw new Error('Please upload the mandatory shopfront photo.');continue;}const base64=await toBase64(file);const p=new URLSearchParams();p.append('action','uploadImage');p.append('fileName',Date.now()+'_'+file.name);p.append('mimeType',file.type||'image/jpeg');p.append('base64Data',base64.split(',')[1]);const d=await jpost(API_BASE,p);if(!d.success)throw new Error(d.message||('Image upload failed for '+f.id));state.uploadedUrls[f.key]=d.fileUrl;}}
+function reset(){state.selectedStore=null;state.responses={};state.uploadedUrls={shopfrontPhotoURL:'',storePhoto1URL:'',storePhoto2URL:'',storePhoto3URL:'',storePhoto4URL:'',storePhoto5URL:''};state.gps={lat:'',lng:'',capturedAt:''};els.dspSelect.value='';['dspCode','dspName','dealerName','ownerName','ownerNumber','city','pincode','state','region','branch','asmName','isdDeployment','capturedLatitude','capturedLongitude','locationCapturedAt','overallRemarks'].forEach(id=>$(id).value='');photos.forEach(p=>$(p.id).value='');renderCriteria();score();els.gpsBadge.textContent='GPS pending';els.gpsBadge.className='status-pill';clear(els.gpsMsg);clear(els.submitMsg);clear(els.uploadMsg);}
+function msg(el,t,typ){el.className='msg '+typ;el.textContent=t;}
+function clear(el){el.className='msg';el.textContent='';}
+const jget=u=>fetch(u).then(r=>r.text()).then(t=>JSON.parse(t));
+const jpost=(u,p)=>fetch(u,{method:'POST',body:p}).then(r=>r.text()).then(t=>JSON.parse(t));
+const toBase64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
+const slug=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+  </script>
 </body>
 </html>
-
 
