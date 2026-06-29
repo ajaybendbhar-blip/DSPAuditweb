@@ -1,217 +1,677 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Daikin DSP Audit</title>
-<style>
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#17324d}
-*{box-sizing:border-box}
-.app{max-width:1180px;margin:0 auto;padding:12px}
-.card,.hero,.section-block,.actCard,.score-stick{background:#fff;border:1px solid #dbe4ef;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.05)}
-.hero{padding:16px;background:linear-gradient(135deg,#0d5cab 0,#0c7be0 100%);color:#fff}
-.card{margin-top:12px;overflow:hidden}
-.head,.section-head{padding:14px;border-bottom:1px solid #dbe4ef;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.body{padding:14px}
-.grid{display:grid;grid-template-columns:1fr;gap:10px}
-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
-input,select,textarea{width:100%;border:1px solid #cfd9e6;border-radius:12px;padding:12px;font-size:16px;background:#fff}
-textarea{min-height:110px}
-.btnrow{display:flex;gap:10px;flex-wrap:wrap}
-.btn{border:none;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;min-height:46px;flex:1 1 140px}
-.pri{background:#0066cc;color:#fff}.sec{background:#eef4fb;color:#004f9e}.ghost{background:#fff;border:1px solid #cfd9e6;color:#004f9e}
-.hide{display:none!important}
-.pill{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:#eef3f8;font-size:12px;font-weight:700}
-.pill.ok{background:#e9f8ef;color:#14804a}
-.msg{display:none;margin-top:12px;padding:12px;border-radius:12px}
-.msg.ok{display:block;background:#e9f8ef;color:#14804a}.msg.err{display:block;background:#fff0ef;color:#c53b32}
-.section-block{margin-top:12px;overflow:hidden}
-.section-score{font-size:12px;font-weight:800;color:#004f9e;background:#eef6ff;padding:6px 10px;border-radius:999px}
-.criteria-item{padding:14px;border-bottom:1px solid #edf1f5}
-.criteria-item:last-child{border-bottom:none}
-.criteria-title{font-weight:800}
-.criteria-meta{font-size:12px;color:#62758b}
-.option-group{display:grid;grid-template-columns:1fr;gap:10px}
-.option{border:1px solid #d6dfeb;border-radius:12px;padding:12px;background:#fbfdff;cursor:pointer}
-.option.active{border-color:#7eb6f7;background:#eef6ff}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sbox{background:#f7fafe;border:1px solid #dbe4ef;border-radius:12px;padding:12px}
-.sbox .l{font-size:12px;color:#62758b;margin-bottom:6px}.sbox .v{font-size:20px;font-weight:900}
-.actCard{padding:12px;margin-bottom:10px}
-.actRow{display:grid;grid-template-columns:1fr;gap:10px}
-.photo-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.photo-slot{border:1px solid #dbe4ef;border-radius:14px;padding:12px;background:#fff}
-.photo-slot.mandatory{border-color:#7eb6f7}
-.photo-slot.good{border-color:#97d7ad;background:#f2fbf5}
-.photo-title{font-weight:800}.photo-note{font-size:12px;color:#62758b}
-.photo-preview{margin-top:8px;max-width:100%;border-radius:10px;display:none}
-.photo-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.smallbtn{min-height:38px;padding:8px 10px;border:none;border-radius:10px;font-weight:700;cursor:pointer}
-.file-name{font-size:12px;margin-top:8px;color:#49637d;word-break:break-word}
-.dspPerf{display:grid;grid-template-columns:1fr;gap:10px}
-.perfBox{background:#f7fafe;border:1px solid #dbe4ef;border-radius:14px;padding:12px}
-.perfBox .k{font-size:12px;color:#62758b}.perfBox .v{font-size:18px;font-weight:800}
-@media (min-width:720px){
-.grid{grid-template-columns:repeat(12,1fr)}
-.c12{grid-column:span 12}.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3}
-.option-group{grid-template-columns:repeat(2,minmax(0,1fr))}
-.sgrid{grid-template-columns:repeat(4,1fr)}
-.actRow{grid-template-columns:repeat(12,1fr)}.a6{grid-column:span 6}.a4{grid-column:span 4}.a12{grid-column:span 12}
-.photo-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.dspPerf{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-</style>
+  <meta charset="UTF-8">
+  <title>DSP Audit WebApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body {
+      background-color: #f3f4f6;
+      font-size: 0.95rem;
+    }
+    .app-shell {
+      max-width: 1100px;
+    }
+    .top-bar {
+      background: linear-gradient(90deg, #111827, #0ea5e9);
+      color: #f9fafb;
+    }
+    .top-bar .title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .top-bar .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+    .user-pill {
+      font-size: 0.8rem;
+      background-color: rgba(15, 23, 42, 0.4);
+      border-radius: 999px;
+      padding: 0.25rem 0.6rem;
+    }
+
+    .card {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      background-color: #ffffff;
+      margin-bottom: 1.1rem;
+    }
+    .card-body {
+      padding: 1.1rem 1.2rem 1.25rem;
+    }
+
+    .section-header {
+      margin-top: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .section-subtitle {
+      font-size: 0.84rem;
+      color: #6b7280;
+    }
+
+    .pill-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #6b7280;
+      margin-bottom: 0.3rem;
+    }
+
+    .metric-tile {
+      border-radius: 10px;
+      padding: 0.7rem 0.8rem;
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 0.6rem;
+    }
+    .metric-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.15rem;
+    }
+    .metric-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .badge-section {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .table-sm th, .table-sm td {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.86rem;
+    }
+
+    label.form-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 576px) {
+      body {
+        font-size: 0.9rem;
+      }
+      .card-body {
+        padding: 1rem;
+      }
+      .app-shell {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+      }
+      .top-bar .subtitle {
+        display: none;
+      }
+      .btn {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="app">
-<section class="hero">
-<h2>Audit progress</h2>
-<p>Login, select store, capture evidence, complete parameters, and submit.</p>
-<div style="margin-top:12px;background:rgba(255,255,255,.16);border-radius:999px;height:10px;overflow:hidden"><div id="progressBar" style="height:100%;width:0;background:#fff;border-radius:999px"></div></div>
-<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span id="progressText">0% complete</span><span id="answeredText">0 / 0 answered</span></div>
-</section>
+  <!-- Top bar -->
+  <nav class="navbar top-bar mb-3">
+    <div class="container app-shell d-flex flex-column flex-sm-row align-items-sm-center py-2">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-shop-window me-2" style="font-size: 1.5rem;"></i>
+        <div>
+          <div class="title">DSP Audit WebApp</div>
+          <div class="subtitle">Login → Select DSP → Capture audit & photos</div>
+        </div>
+      </div>
+      <div class="ms-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+        <span id="userInfoPill" class="user-pill d-none">
+          <span id="userNameText"></span>
+          <span class="text-muted"> • </span>
+          <span id="userRoleText"></span>
+        </span>
+      </div>
+    </div>
+  </nav>
 
-<section class="card" id="loginCard">
-<div class="head"><div><h3>Login</h3><p>Enter Employee ID only.</p></div></div>
-<div class="body">
-<div class="grid">
-<div class="field c12"><label>Employee ID</label><input id="employeeId" type="text" placeholder="Enter employee ID"></div>
-<input id="password" type="password" class="hide" readonly>
-</div>
-<div class="btnrow" style="margin-top:14px"><button class="btn pri" id="loginBtn">Login</button></div>
-<div id="loginMsg" class="msg"></div>
-</div>
-</section>
+  <div class="container app-shell pb-4">
 
-<section class="card hide" id="auditCard">
-<div class="head"><div><h3>Audit details</h3><p>All store fields auto-fill after selecting DSP.</p></div><span class="pill ok">Logged in</span></div>
-<div class="body">
-<div class="grid">
-<div class="field c12"><label>Select DSP</label><select id="dspSelect"><option value="">Select mapped DSP</option></select></div>
-<div class="field c6"><label>Audit Date</label><input id="auditDate" type="date"></div>
-<div class="field c6"><label>Audit Time</label><input id="auditTime" type="time"></div>
-<div class="field c4"><label>DSP Code</label><input id="dspCode" readonly></div>
-<div class="field c4"><label>Store Name</label><input id="dspName" readonly></div>
-<div class="field c4"><label>Dealer Name</label><input id="dealerName" readonly></div>
-<div class="field c4"><label>Owner Name</label><input id="ownerName" readonly></div>
-<div class="field c4"><label>Owner Number</label><input id="ownerNumber" readonly></div>
-<div class="field c4"><label>City</label><input id="city" readonly></div>
-<div class="field c3"><label>Pincode</label><input id="pincode" readonly></div>
-<div class="field c3"><label>State</label><input id="state" readonly></div>
-<div class="field c3"><label>Region</label><input id="region" readonly></div>
-<div class="field c3"><label>Branch</label><input id="branch" readonly></div>
-<div class="field c6"><label>ASM Name</label><input id="asmName" readonly></div>
-<div class="field c6"><label>ISD Deployment</label><input id="isdDeployment" readonly></div>
-</div>
+    <!-- SECTION 1: Login -->
+    <div id="loginSection">
+      <div class="section-header">
+        <div class="section-title">1. Login</div>
+        <div class="section-subtitle">Enter Employee ID and password to load your mapped DSPs.</div>
+      </div>
 
-<div class="section-block">
-<div class="section-head"><div><h4>DSP Performance</h4><div class="photo-note">Performance values from StoreMaster.</div></div></div>
-<div class="body"><div class="dspPerf" id="dspPerf"></div></div>
-</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label mb-1">Employee ID</label>
+              <input id="employeeIdInput" type="text" class="form-control form-control-sm" placeholder="e.g. 9029888906">
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label mb-1">Password</label>
+              <input id="passwordInput" type="password" class="form-control form-control-sm" placeholder="Daikin@123">
+            </div>
+          </div>
 
-<div class="section-block">
-<div class="section-head"><div><h4>Photo Evidence</h4><div class="photo-note">Take from camera or choose from gallery, compress, upload, and save URL.</div></div></div>
-<div class="body">
-<div class="photo-grid" id="photoEvidence"></div>
-<div id="photoMsg" class="msg"></div>
-</div>
-</div>
+          <div class="d-flex flex-column flex-md-row align-items-md-center">
+            <button class="btn btn-primary me-md-2 mb-2 mb-md-0" onclick="handleLogin()">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Login
+            </button>
+            <span id="loginStatus" class="text-muted small ms-md-2"></span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div class="section-block">
-<div class="section-head"><div><h4>Activity Planned</h4><div class="photo-note">Add one or more planned activities.</div></div></div>
-<div class="body">
-<div id="activityPlanner"></div>
-<div class="btnrow" style="margin-top:12px"><button class="btn sec" id="addActivityBtn" type="button">Add Activity</button><button class="btn ghost" id="savePlanBtn" type="button">Save Activity Plan</button></div>
-<div id="planMsg" class="msg"></div>
-</div>
-</div>
+    <!-- SECTION 2: Audit form (hidden until login) -->
+    <div id="auditSection" style="display:none;">
+      <!-- DSP selection -->
+      <div class="section-header">
+        <div class="section-title">2. DSP selection</div>
+        <div class="section-subtitle">Choose DSP from your mapped list; details will auto-fill.</div>
+      </div>
 
-<div class="section-block">
-<div class="section-head"><div><h4>GPS capture</h4><div class="photo-note">Capture location before submission.</div></div></div>
-<div class="body">
-<div class="btnrow"><button class="btn sec" id="gpsBtn" type="button">Capture GPS</button></div>
-<div class="grid" style="margin-top:12px">
-<div class="field c4"><label>Latitude</label><input id="capturedLatitude" readonly></div>
-<div class="field c4"><label>Longitude</label><input id="capturedLongitude" readonly></div>
-<div class="field c4"><label>Captured At</label><input id="locationCapturedAt" readonly></div>
-</div>
-<div id="gpsMsg" class="msg"></div>
-</div>
-</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="pill-label">Store</div>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-5">
+              <label class="form-label mb-1">DSP (store)</label>
+              <select id="dspSelect" class="form-select form-select-sm" onchange="onDspChange()">
+                <option value="">-- Select DSP --</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label mb-1">Search by name</label>
+              <input id="dspSearchInput" type="text" class="form-control form-control-sm" placeholder="Type to filter" oninput="filterDspList()">
+            </div>
+          </div>
 
-<div class="section-block">
-<div class="section-head"><div><h4>Audit parameters</h4><div class="photo-note">Section-wise scoring cards.</div></div></div>
-<div class="body"><div id="criteriaContainer"></div></div>
-</div>
+          <hr class="my-3">
 
-<div class="grid" style="margin-top:14px">
-<div class="field c12"><label>Overall Remarks</label><textarea id="overallRemarks"></textarea></div>
-</div>
+          <div class="pill-label mb-2">DSP snapshot</div>
+          <div id="dspSnapshot">
+            <p class="text-muted mb-0">Login and pick a DSP to see store details.</p>
+          </div>
+        </div>
+      </div>
 
-<div class="score-stick" style="margin-top:12px;padding:14px">
-<div class="sgrid">
-<div class="sbox"><div class="l">Final Score</div><div class="v" id="finalScore">0.00</div></div>
-<div class="sbox"><div class="l">Compliance %</div><div class="v" id="compliancePercent">0</div></div>
-<div class="sbox"><div class="l">Grade</div><div class="v" id="gradeText">Pending</div></div>
-<div class="sbox"><div class="l">Answered</div><div class="v" id="answeredCount">0</div></div>
-</div>
-<div class="btnrow" style="margin-top:12px"><button class="btn pri" id="submitBtn" type="button">Submit Audit</button><button class="btn sec" id="resetBtn" type="button">Reset Form</button></div>
-<div id="submitMsg" class="msg"></div>
-</div>
-</div>
-</section>
-</div>
+      <!-- Audit details -->
+      <div class="section-header">
+        <div class="section-title">3. Audit details</div>
+        <div class="section-subtitle">Capture date/time, photos, and section-wise ratings.</div>
+      </div>
 
-<script>
-const API_BASE='https://script.google.com/macros/s/AKfycbzwCGX7Dr5MdYa9WvQPRuRtnRS3JO0pnt-XuJm3SWmXbbhH-QW9kDJXdXP_vIVLKBs_gg/exec';
-const AUTO_PASSWORD='Daikin@123';
-const fallbackActivities=['Influencer','Corporate Tie-Ups','Society Activation'];
-const state={user:null,stores:[],criteria:[],grades:[],selectedStore:null,responses:{},activityRows:[],activityTypes:[],gps:{lat:'',lng:'',capturedAt:''},photoFiles:{}};
-const $=id=>document.getElementById(id);
-const E={loginCard:$('loginCard'),auditCard:$('auditCard'),employeeId:$('employeeId'),password:$('password'),loginBtn:$('loginBtn'),loginMsg:$('loginMsg'),dspSelect:$('dspSelect'),auditDate:$('auditDate'),auditTime:$('auditTime'),dspCode:$('dspCode'),dspName:$('dspName'),dealerName:$('dealerName'),ownerName:$('ownerName'),ownerNumber:$('ownerNumber'),city:$('city'),pincode:$('pincode'),state:$('state'),region:$('region'),branch:$('branch'),asmName:$('asmName'),isdDeployment:$('isdDeployment'),activityPlanner:$('activityPlanner'),addActivityBtn:$('addActivityBtn'),savePlanBtn:$('savePlanBtn'),planMsg:$('planMsg'),gpsBtn:$('gpsBtn'),gpsMsg:$('gpsMsg'),capturedLatitude:$('capturedLatitude'),capturedLongitude:$('capturedLongitude'),locationCapturedAt:$('locationCapturedAt'),criteriaContainer:$('criteriaContainer'),finalScore:$('finalScore'),compliancePercent:$('compliancePercent'),gradeText:$('gradeText'),answeredCount:$('answeredCount'),overallRemarks:$('overallRemarks'),submitBtn:$('submitBtn'),resetBtn:$('resetBtn'),submitMsg:$('submitMsg'),progressBar:$('progressBar'),progressText:$('progressText'),answeredText:$('answeredText'),dspPerf:$('dspPerf'),photoEvidence:$('photoEvidence'),photoMsg:$('photoMsg')};
-const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      <div class="card">
+        <div class="card-body">
+          <!-- Basic audit info -->
+          <div class="row g-3 mb-3">
+            <div class="col-6 col-md-3">
+              <label class="form-label mb-1">Audit Date</label>
+              <input id="auditDateInput" type="date" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label mb-1">Audit Time</label>
+              <input id="auditTimeInput" type="time" class="form-control form-control-sm">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label mb-1">Location capture</label>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="captureLocation()">
+                  <i class="bi bi-geo-alt me-1"></i> Capture GPS
+                </button>
+                <span id="locationStatus" class="text-muted small"></span>
+              </div>
+            </div>
+          </div>
 
-document.addEventListener('DOMContentLoaded',()=>{const n=new Date();E.auditDate.value=n.toISOString().slice(0,10);E.auditTime.value=n.toTimeString().slice(0,5);E.password.value=AUTO_PASSWORD;bind();addActivityRow();renderPhotoEvidence();});
+          <!-- Photos (just URLs for web version) -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-3">
+              <label class="form-label mb-1">Shopfront photo URL</label>
+              <input id="shopfrontPhotoUrlInput" type="url" class="form-control form-control-sm" placeholder="Drive link">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label mb-1">Store photo 1 URL</label>
+              <input id="storePhoto1UrlInput" type="url" class="form-control form-control-sm" placeholder="Drive link">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label mb-1">Store photo 2 URL</label>
+              <input id="storePhoto2UrlInput" type="url" class="form-control form-control-sm" placeholder="Drive link">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label mb-1">Store photo 3 URL</label>
+              <input id="storePhoto3UrlInput" type="url" class="form-control form-control-sm" placeholder="Drive link">
+            </div>
+          </div>
 
-function bind(){E.loginBtn.onclick=login;E.dspSelect.onchange=storeChange;E.gpsBtn.onclick=gps;E.submitBtn.onclick=submit;E.resetBtn.onclick=()=>location.reload();E.addActivityBtn.onclick=()=>addActivityRow();E.savePlanBtn.onclick=savePlan;updateProgress()}
-function msg(el,text,type){el.className='msg '+type;el.textContent=text}
-async function api(action,payload){const res=await fetch(API_BASE+'?action='+encodeURIComponent(action),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action},payload||{}))});return JSON.parse(await res.text())}
-function fileToBase64(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)})}
-function stripPrefix_(s){return String(s||'').split(',').pop()}
-async function compressFile(file,maxW=1280,quality=0.72){const dataUrl=await fileToBase64(file);const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=dataUrl});let w=img.naturalWidth,h=img.naturalHeight;if(w>maxW){h=Math.round(h*(maxW/w));w=maxW}const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);const out=c.toDataURL('image/jpeg',quality);return out}
-async function uploadPhotoByInput(inputEl,slotId){const file=inputEl.files&&inputEl.files[0];if(!file)throw new Error('Select a photo first');msg(E.photoMsg,'Uploading '+slotId+' ...','ok');const compressed=await compressFile(file);const r=await api('UPLOADIMAGE',{base64Data:stripPrefix_(compressed),fileName:slotId+'_'+Date.now()+'.jpg',mimeType:'image/jpeg'});if(!r.success)throw new Error(r.message||'Image upload failed');return r.fileUrl}
-function esc(s){return String(s==null?'':s).replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]))}
-async function login(){const employeeId=E.employeeId.value.trim();if(!employeeId)return msg(E.loginMsg,'Enter employee ID.','err');E.loginBtn.disabled=true;E.loginBtn.textContent='Logging in...';try{const d=await api('LOGIN',{employeeId,password:AUTO_PASSWORD});if(!d.success)throw new Error(d.message||'Login failed');state.user=d.user;state.stores=d.stores||[];state.criteria=d.criteria||[];state.grades=d.grades||[];state.activityTypes=(d.activityTypes&&d.activityTypes.length)?d.activityTypes:fallbackActivities;E.loginCard.classList.add('hide');E.auditCard.classList.remove('hide');renderStores();renderCriteria();renderActivityRows();score();updateProgress();msg(E.submitMsg,'Login successful. Select a DSP to begin.','ok')}catch(e){msg(E.loginMsg,e.message,'err')}finally{E.loginBtn.disabled=false;E.loginBtn.textContent='Login'}}
-function renderStores(){E.dspSelect.innerHTML='<option value="">Select mapped DSP</option>';state.stores.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=(s.DSPCode||'')+' - '+(s.DSPName||'')+' ('+(s.City||'')+')';E.dspSelect.appendChild(o)})}
-function storeChange(){const s=state.stores[Number(E.dspSelect.value)]||null;state.selectedStore=s;[['dspCode','DSPCode'],['dspName','DSPName'],['dealerName','DealerName'],['ownerName','OwnerName'],['ownerNumber','OwnerNumber'],['city','City'],['pincode','Pincode'],['state','State'],['region','Region'],['branch','Branch'],['asmName','ASMName'],['isdDeployment','ISDDeployment']].forEach(([a,b])=>$(a).value=s?(s[b]||''):'' );renderPerformance();renderPhotoEvidence();renderActivityRows()}
-function renderPerformance(){if(!state.selectedStore){E.dspPerf.innerHTML='';return}const s=state.selectedStore;const items=[['RA FY24',s.RA_FY24],['RA FY25',s.RA_FY25],['SA FY24',s.SA_FY24],['SA FY25',s.SA_FY25],['VRV FY24',s.VRV_FY24],['VRV FY25',s.VRV_FY25],['RA YTD26',s.RA_YTD26],['SA YTD26',s.SA_YTD26],['VRV YTD26',s.VRV_YTD26],['Ratings',s.CurrentCustomerRatings],["FY24 TO",s.FY24TotalTO],["FY25 TO",s.FY25TotalTO]];E.dspPerf.innerHTML=items.map(([k,v])=>'<div class="perfBox"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v==null?'':v)+'</div></div>').join('')}
-function renderPhotoEvidence(){const photos=[{id:'shopfrontPhotoURL',title:'Shopfront Photo',req:true},{id:'storePhoto1URL',title:'Store Photo 1',req:false},{id:'storePhoto2URL',title:'Store Photo 2',req:false},{id:'storePhoto3URL',title:'Store Photo 3',req:false}];E.photoEvidence.innerHTML=photos.map(p=>`<div class="photo-slot ${p.req?'mandatory':''}" id="slot_${p.id}">
-<div class="photo-title">${esc(p.title)}</div>
-<div class="photo-note">${p.req?'Required':'Optional'}</div>
-<input type="file" accept="image/*" capture="environment" data-photo="${p.id}">
-<div class="photo-row">
-<button class="smallbtn sec" type="button" data-upload="${p.id}">Submit Photo</button>
-<button class="smallbtn ghost" type="button" data-clear="${p.id}">Clear</button>
-</div>
-<img class="photo-preview" id="preview_${p.id}">
-<div class="file-name" id="name_${p.id}"></div>
-<div class="file-name" id="url_${p.id}"></div>
-</div>`).join('');
-document.querySelectorAll('[data-photo]').forEach(inp=>inp.onchange=async e=>{const id=e.target.dataset.photo;const f=e.target.files&&e.target.files[0];if(!f)return;$('name_'+id).textContent=f.name;const preview=await compressFile(f,1280,0.78);$('preview_'+id).src=preview;$('preview_'+id).style.display='block';state.photoFiles[id]={file:f,compressed:preview,url:''}});
-document.querySelectorAll('[data-upload]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.upload;try{const obj=state.photoFiles[id];if(!obj||!obj.compressed)throw new Error('Select a photo first');btn.disabled=true;btn.textContent='Uploading...';const r=await api('UPLOADIMAGE',{base64Data:stripPrefix_(obj.compressed),fileName:id+'_'+Date.now()+'.jpg',mimeType:'image/jpeg'});if(!r.success)throw new Error(r.message||'Upload failed');obj.url=r.fileUrl;$('url_'+id).textContent=r.fileUrl;$('slot_'+id).classList.add('good');msg(E.photoMsg,'Uploaded '+id+' successfully.','ok')}catch(err){msg(E.photoMsg,err.message,'err')}finally{btn.disabled=false;btn.textContent='Submit Photo'}})
-document.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>{const id=btn.dataset.clear;state.photoFiles[id]=null;const i=document.querySelector('[data-photo="'+id+'"]');if(i)i.value='';$('name_'+id).textContent='';$('url_'+id).textContent='';$('preview_'+id).src='';$('preview_'+id).style.display='none';$('slot_'+id).classList.remove('good')})}
-function renderCriteria(){const grouped={};state.criteria.forEach(sec=>grouped[sec.SectionName]=sec.Items||[]);E.criteriaContainer.innerHTML='';Object.keys(grouped).forEach(sec=>{const wrap=document.createElement('div');wrap.className='section-block';wrap.innerHTML='<div class="section-head"><div><h4>'+esc(sec)+'</h4><div class="photo-note">Section wise scoring cards.</div></div><div class="section-score">0.00</div></div><div class="section-body"></div>';const body=wrap.querySelector('.section-body');grouped[sec].forEach(item=>{const itemDiv=document.createElement('div');itemDiv.className='criteria-item';itemDiv.innerHTML='<div class="criteria-top"><div><div class="criteria-title">'+esc(item.ParameterName)+'</div><div class="criteria-meta">Weightage: '+Number(item.Weightage).toFixed(2)+' · Photo Required: '+esc(item.PhotoRequired||'No')+'</div></div><div class="criteria-meta">Criteria ID: '+esc(item.CriteriaID)+'</div></div><div class="option-group">'+(item.Options||[]).map(opt=>'<div class="option" data-criteria="'+item.CriteriaID+'" data-optionid="'+opt.OptionID+'" data-points="'+opt.OptionPoints+'"><div class="criteria-top"><div class="criteria-title"><input type="radio" name="criteria_'+item.CriteriaID+'" value="'+opt.OptionID+'"> '+esc(opt.OptionLabel)+'</div><div class="pill">'+opt.OptionPoints+' pts</div></div></div>').join('')+'</div>';body.appendChild(itemDiv)});E.criteriaContainer.appendChild(wrap)});document.querySelectorAll('.option').forEach(card=>card.onclick=()=>{const cid=card.dataset.criteria,oid=card.dataset.optionid,pts=Number(card.dataset.points||0);const c=findCriteria(cid);const o=c?.Options?.find(x=>x.OptionID===oid);state.responses[cid]={CriteriaID:cid,ParameterName:c?.ParameterName||'',SectionName:c?.SectionName||'',Weightage:Number(c?.Weightage||0),SelectedOptionID:oid,SelectedOption:o?.OptionLabel||'',SelectedPoints:pts,WeightedScore:Number((((pts||0)/10)*Number(c?.Weightage||0)*10).toFixed(2))};document.querySelectorAll('.option[data-criteria="'+cid+'"]').forEach(x=>x.classList.remove('active'));card.classList.add('active');const r=card.querySelector('input');if(r)r.checked=true;score();updateProgress()})}
-function findCriteria(cid){for(const sec of state.criteria){const item=(sec.Items||[]).find(x=>x.CriteriaID===cid);if(item)return item}return null}
-function renderActivityRows(){if(!state.selectedStore){E.activityPlanner.innerHTML='';return}if(!state.activityRows.length)addActivityRow();E.activityPlanner.innerHTML=state.activityRows.map((r,idx)=>activityHTML(idx,r)).join('');wireActivities()}
-function activityHTML(idx,r){const types=(state.activityTypes&&state.activityTypes.length)?state.activityTypes:fallbackActivities;return '<div class="actCard"><div class="actHead"><div><b>Activity '+(idx+1)+'</b></div><button type="button" class="btn ghost" data-del="'+idx+'" style="flex:0 0 auto;min-height:38px;padding:8px 12px;">Remove</button></div><div class="actRow"><div class="field a6"><label>Activity Type</label><select data-type="'+idx+'"><option value="">Select activity</option>'+types.map(v=>'<option '+(r.type===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select></div><div class="field a4"><label>Month</label><select data-month="'+idx+'"><option value="">Select month</option>'+months.map(m=>'<option '+(r.month===m?'selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field a4"><label>Status</label><select data-status="'+idx+'"><option'+(r.status==='Planned'?' selected':'')+'>Planned</option><option'+(r.status==='In Progress'?' selected':'')+'>In Progress</option><option'+(r.status==='Done'?' selected':'')+'>Done</option></select></div><div class="field a12"><label>Remarks</label><textarea data-remarks="'+idx+'" style="min-height:70px">'+esc(r.remarks||'')+'</textarea></div></div></div>'}
-function wireActivities(){document.querySelectorAll('[data-type]').forEach(el=>el.onchange=e=>{state.activityRows[Number(el.dataset.type)].type=e.target.value});document.querySelectorAll('[data-month]').forEach(el=>el.onchange=e=>{state.activityRows[Number(el.dataset.month)].month=e.target.value});document.querySelectorAll('[data-status]').forEach(el=>el.onchange=e=>{state.activityRows[Number(el.dataset.status)].status=e.target.value});document.querySelectorAll('[data-remarks]').forEach(el=>el.oninput=e=>{state.activityRows[Number(el.dataset.remarks)].remarks=e.target.value});document.querySelectorAll('[data-del]').forEach(btn=>btn.onclick=()=>{state.activityRows.splice(Number(btn.dataset.del),1);renderActivityRows()})}
-function addActivityRow(){state.activityRows.push({type:'',month:'',status:'Planned',remarks:''});if(state.selectedStore)renderActivityRows()}
-function savePlan(){if(!state.selectedStore)return msg(E.planMsg,'Select a DSP first.','err');const items=state.activityRows.filter(r=>r.type&&r.month).map(r=>({DSPCode:state.selectedStore.DSPCode,ActivityType:r.type,SuggestedMonth:r.month,Status:r.status||'Planned',Remarks:r.remarks||'',UpdatedAt:new Date().toISOString()}));if(!items.length)return msg(E.planMsg,'Add at least one complete activity row.','err');api('SAVEACTIVITYPLAN',{itemsJSON:JSON.stringify(items)}).then(d=>{if(!d.success)throw new Error(d.message||'Save failed');msg(E.planMsg,'Activity plan saved.','ok')}).catch(e=>msg(E.planMsg,e.message,'err'))}
-function gps(){if(!navigator.geolocation)return msg(E.gpsMsg,'Geolocation not supported.','err');E.gpsBtn.disabled=true;E.gpsBtn.textContent='Capturing...';navigator.geolocation.getCurrentPosition(p=>{state.gps.lat=p.coords.latitude.toFixed(6);state.gps.lng=p.coords.longitude.toFixed(6);state.gps.capturedAt=new Date().toISOString();E.capturedLatitude.value=state.gps.lat;E.capturedLongitude.value=state.gps.lng;E.locationCapturedAt.value=state.gps.capturedAt;msg(E.gpsMsg,'GPS captured successfully.','ok');E.gpsBtn.disabled=false;E.gpsBtn.textContent='Capture GPS'},err=>{msg(E.gpsMsg,err.message||'GPS capture failed','err');E.gpsBtn.disabled=false;E.gpsBtn.textContent='Capture GPS'},{enableHighAccuracy:true,timeout:15000,maximumAge:0})}
-function getFinalGrade(percent){const p=Number(percent||0);for(const g of state.grades){if(p>=Number(g.CompliancePercentFrom||0)&&p<=Number(g.CompliancePercentTo||0))return g.GradeName}return 'Pending'}
-function score(){let total=0,answered=0;state.criteria.forEach(sec=>sec.Items.forEach(it=>{const r=state.responses[it.CriteriaID];if(r){answered++;total+=Number(r.WeightedScore||0)}}));const final=(total/100).toFixed(2);const pct=Math.min(100,Math.max(0,total*10)).toFixed(0);E.finalScore.textContent=final;E.compliancePercent.textContent=pct;E.gradeText.textContent=getFinalGrade(pct);E.answeredCount.textContent=answered;updateProgress()}
-function updateProgress(){const totalCriteria=state.criteria.reduce((a,s)=>a+(s.Items||[]).length,0);const answered=Object.keys(state.responses).length;const pct=totalCriteria?Math.round((answered/totalCriteria)*100):0;E.progressBar.style.width=pct+'%';E.progressText.textContent=pct+'% complete';E.answeredText.textContent=answered+' / '+totalCriteria+' answered'}
-async function submit(){try{if(!state.selectedStore)return msg(E.submitMsg,'Select a DSP first.','err');E.submitBtn.disabled=true;E.submitBtn.textContent='Submitting...';const photo1=state.photoFiles.shopfrontPhotoURL?.url||'';const photo2=state.photoFiles.storePhoto1URL?.url||'';const photo3=state.photoFiles.storePhoto2URL?.url||'';const photo4=state.photoFiles.storePhoto3URL?.url||'';const getResp=cid=>state.responses[cid]||{};const payload={auditDate:E.auditDate.value,auditTime:E.auditTime.value,employeeId:state.user.EmployeeID,employeeName:state.user.EmployeeName,role:state.user.Role,region:state.user.Region,branch:state.user.Branch,dspCode:state.selectedStore.DSPCode,dspName:state.selectedStore.DSPName,dealerName:state.selectedStore.DealerName,ownerName:state.selectedStore.OwnerName,ownerNumber:state.selectedStore.OwnerNumber,city:state.selectedStore.City,pincode:state.selectedStore.Pincode,state:state.selectedStore.State,isdDeployment:state.selectedStore.ISDDeployment,asmName:state.selectedStore.ASMName,capturedLatitude:state.gps.lat,capturedLongitude:state.gps.lng,locationCapturedAt:state.gps.capturedAt,shopfrontPhotoURL:photo1,storePhoto1URL:photo2,storePhoto2URL:photo3,storePhoto3URL:photo4,productDisplayRAOption:getResp('CRT001').SelectedOption||'',productDisplayRA_Points:getResp('CRT001').SelectedPoints||'',productDisplayRA_WeightedScore:getResp('CRT001').WeightedScore||'',productDisplayCassetteTowerOption:getResp('CRT002').SelectedOption||'',productDisplayCassetteTower_Points:getResp('CRT002').SelectedPoints||'',productDisplayCassetteTower_WeightedScore:getResp('CRT002').WeightedScore||'',brandingFrontBoardOption:getResp('CRT003').SelectedOption||'',brandingFrontBoard_Points:getResp('CRT003').SelectedPoints||'',brandingFrontBoard_WeightedScore:getResp('CRT003').WeightedScore||'',brandingInternalOption:getResp('CRT004').SelectedOption||'',brandingInternal_Points:getResp('CRT004').SelectedPoints||'',brandingInternal_WeightedScore:getResp('CRT004').WeightedScore||'',interiorCleaninessOption:getResp('CRT005').SelectedOption||'',interiorCleaniness_Points:getResp('CRT005').SelectedPoints||'',interiorCleaniness_WeightedScore:getResp('CRT005').WeightedScore||'',isdProductKnowledgeOption:getResp('CRT006').SelectedOption||'',isdProductKnowledge_Points:getResp('CRT006').SelectedPoints||'',isdProductKnowledge_WeightedScore:getResp('CRT006').WeightedScore||'',isdUniformOption:getResp('CRT007').SelectedOption||'',isdUniform_Points:getResp('CRT007').SelectedPoints||'',isdUniform_WeightedScore:getResp('CRT007').WeightedScore||'',ratingCardOption:getResp('CRT008').SelectedOption||'',ratingCard_Points:getResp('CRT008').SelectedPoints||'',ratingCard_WeightedScore:getResp('CRT008').WeightedScore||'',cardPaperFinanceOption:getResp('CRT009').SelectedOption||'',cardPaperFinance_Points:getResp('CRT009').SelectedPoints||'',cardPaperFinance_WeightedScore:getResp('CRT009').WeightedScore||'',finalScore:E.finalScore.textContent,compliancePercent:E.compliancePercent.textContent,grade:E.gradeText.textContent,overallRemarks:E.overallRemarks.value};const d=await api('SUBMITAUDIT',payload);if(!d.success)throw new Error(d.message||'Submit failed');msg(E.submitMsg,'Audit submitted successfully. ID: '+d.auditId,'ok')}catch(e){msg(E.submitMsg,e.message,'err')}finally{E.submitBtn.disabled=false;E.submitBtn.textContent='Submit Audit'}}
-</script>
+          <hr class="my-3">
+
+          <!-- Criteria sections will be rendered dynamically -->
+          <div id="criteriaContainer"></div>
+
+          <hr class="my-3">
+
+          <!-- Summary metrics -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+              <div class="metric-tile">
+                <div class="metric-label">Final score</div>
+                <div class="metric-value" id="finalScoreText">0.00</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="metric-tile">
+                <div class="metric-label">Compliance %</div>
+                <div class="metric-value" id="compliancePercentText">0%</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="metric-tile">
+                <div class="metric-label">Grade</div>
+                <div class="metric-value" id="gradeText">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label mb-1">Overall remarks</label>
+            <textarea id="overallRemarksInput" class="form-control form-control-sm" rows="2" placeholder="Key observations, action points"></textarea>
+          </div>
+
+          <div class="d-flex flex-column flex-md-row align-items-md-center">
+            <button class="btn btn-success me-md-2 mb-2 mb-md-0" onclick="submitAudit()">
+              <i class="bi bi-check2-circle me-1"></i> Submit audit
+            </button>
+            <span id="submitStatus" class="text-muted small ms-md-2"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-3 text-center text-muted small">
+      DSP Audit | Internal tool | Hosted via GitHub Pages
+    </footer>
+  </div>
+
+  <script>
+    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx0X2rN-Hj-TAj-FD5XRXpjsYWBf-JBXeNf-krAeI-P060I6eaIWJqmeC_kHnHEBoYG2w/exec';
+
+    let currentUser = null;
+    let allStores = [];
+    let filteredStores = [];
+    let criteriaSections = [];
+    let gradeBands = [];
+
+    async function callApi(action, payload = {}) {
+      const body = { action, ...payload };
+      const res = await fetch(APPSCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body)
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    function handleLogin() {
+      const empId = document.getElementById('employeeIdInput').value.trim();
+      const pwd   = document.getElementById('passwordInput').value.trim();
+      const status = document.getElementById('loginStatus');
+      status.textContent = 'Logging in...';
+
+      if (!empId || !pwd) {
+        status.textContent = 'Enter Employee ID and password.';
+        return;
+      }
+
+      callApi('LOGIN', { employeeId: empId, password: pwd })
+        .then(resp => {
+          if (!resp.success) {
+            status.textContent = resp.message || 'Login failed.';
+            return;
+          }
+          status.textContent = 'Login successful.';
+          currentUser = resp.user;
+
+          // Show user pill
+          const pill = document.getElementById('userInfoPill');
+          document.getElementById('userNameText').textContent = currentUser.EmployeeName || '';
+          document.getElementById('userRoleText').textContent = currentUser.Role || '';
+          pill.classList.remove('d-none');
+
+          // Load stores (already scoped in backend)
+          allStores = resp.stores || [];
+          filteredStores = allStores.slice();
+          populateDspDropdown();
+
+          // Criteria and grades
+          criteriaSections = resp.criteria || [];
+          gradeBands = resp.grades || [];
+          renderCriteriaSections();
+
+          // Switch sections
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('auditSection').style.display = 'block';
+
+          initAuditDateTime();
+        })
+        .catch(err => {
+          console.error(err);
+          status.textContent = 'Error during login.';
+        });
+    }
+
+    function populateDspDropdown() {
+      const sel = document.getElementById('dspSelect');
+      sel.innerHTML = '<option value="">-- Select DSP --</option>';
+      filteredStores.forEach((s, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${s.DSPName} (${s.DSPCode}) - ${s.City}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function filterDspList() {
+      const term = document.getElementById('dspSearchInput').value.toLowerCase();
+      if (!term) {
+        filteredStores = allStores.slice();
+      } else {
+        filteredStores = allStores.filter(s =>
+          String(s.DSPName || '').toLowerCase().includes(term) ||
+          String(s.DSPCode || '').toLowerCase().includes(term) ||
+          String(s.City || '').toLowerCase().includes(term)
+        );
+      }
+      populateDspDropdown();
+    }
+
+    function onDspChange() {
+      const sel = document.getElementById('dspSelect');
+      const idx = sel.value ? parseInt(sel.value, 10) : -1;
+      if (idx < 0 || idx >= filteredStores.length) {
+        document.getElementById('dspSnapshot').innerHTML =
+          '<p class="text-muted mb-0">Login and pick a DSP to see store details.</p>';
+        return;
+      }
+      const store = filteredStores[idx];
+      renderDspSnapshot(store);
+    }
+
+    function renderDspSnapshot(store) {
+      const div = document.getElementById('dspSnapshot');
+      const html = `
+        <div class="row mb-2">
+          <div class="col-md-4"><strong>DSP Code:</strong> ${store.DSPCode}</div>
+          <div class="col-md-4"><strong>DSP Name:</strong> ${store.DSPName}</div>
+          <div class="col-md-4"><strong>Dealer:</strong> ${store.DealerName || '-'}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-4"><strong>Owner:</strong> ${store.OwnerName || '-'}</div>
+          <div class="col-md-4"><strong>Contact:</strong> ${store.OwnerNumber || '-'}</div>
+          <div class="col-md-4"><strong>City:</strong> ${store.City}, ${store.State}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-4"><strong>Region:</strong> ${store.Region}</div>
+          <div class="col-md-4"><strong>Branch:</strong> ${store.Branch}</div>
+          <div class="col-md-4"><strong>ASM:</strong> ${store.ASMName || '-'}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-4"><strong>ISD Deployment:</strong> ${store.ISDDeployment || '-'}</div>
+          <div class="col-md-4"><strong>Current rating:</strong> ${store.CurrentCustomerRatings || '-'}</div>
+          <div class="col-md-4"><strong>FY'25 TO (Mn):</strong> ${store.FY25TotalTO || '-'}</div>
+        </div>
+      `;
+      div.innerHTML = html;
+    }
+
+    function initAuditDateTime() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mi = String(now.getMinutes()).padStart(2, '0');
+
+      document.getElementById('auditDateInput').value = `${yyyy}-${mm}-${dd}`;
+      document.getElementById('auditTimeInput').value = `${hh}:${mi}`;
+    }
+
+    function captureLocation() {
+      const status = document.getElementById('locationStatus');
+      if (!navigator.geolocation) {
+        status.textContent = 'Geolocation not supported.';
+        return;
+      }
+      status.textContent = 'Capturing location...';
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          status.textContent = `Lat ${lat.toFixed(5)}, Lng ${lng.toFixed(5)}`;
+          document.getElementById('locationStatus').dataset.lat = lat;
+          document.getElementById('locationStatus').dataset.lng = lng;
+          document.getElementById('locationStatus').dataset.capturedAt = new Date().toISOString();
+        },
+        err => {
+          status.textContent = 'Unable to get location.';
+        }
+      );
+    }
+
+    function renderCriteriaSections() {
+      const container = document.getElementById('criteriaContainer');
+      container.innerHTML = '';
+
+      criteriaSections.forEach(section => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const header = document.createElement('div');
+        header.className = 'd-flex justify-content-between align-items-center mb-2';
+        header.innerHTML = `
+          <div class="badge bg-primary badge-section">${section.SectionName}</div>
+        `;
+        body.appendChild(header);
+
+        section.Items.forEach(item => {
+          const block = document.createElement('div');
+          block.className = 'mb-2';
+          const selectId = `criteria_${item.CriteriaID}`;
+          const pointsId = `points_${item.CriteriaID}`;
+          const weightId = `weight_${item.CriteriaID}`;
+
+          const optionsHtml = item.Options.map(o =>
+            `<option value="${o.OptionID}" data-points="${o.OptionPoints}">
+              ${o.OptionLabel} (${o.OptionPoints})
+            </option>`
+          ).join('');
+
+          block.innerHTML = `
+            <label class="form-label mb-1">${item.ParameterName}</label>
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-md-6">
+                <select id="${selectId}" class="form-select form-select-sm" onchange="onCriteriaChange('${item.CriteriaID}', ${item.Weightage})">
+                  <option value="">-- Select option --</option>
+                  ${optionsHtml}
+                </select>
+              </div>
+              <div class="col-6 col-md-3">
+                <small class="text-muted">Points:</small>
+                <div id="${pointsId}" class="small">0</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <small class="text-muted">Weighted score:</small>
+                <div id="${weightId}" class="small">0.00</div>
+              </div>
+            </div>
+          `;
+          body.appendChild(block);
+        });
+
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    function onCriteriaChange(criteriaId, weightage) {
+      const sel = document.getElementById(`criteria_${criteriaId}`);
+      const pointsDiv = document.getElementById(`points_${criteriaId}`);
+      const weightDiv = document.getElementById(`weight_${criteriaId}`);
+      if (!sel || !pointsDiv || !weightDiv) return;
+
+      const opt = sel.options[sel.selectedIndex];
+      const pts = opt && opt.dataset.points ? Number(opt.dataset.points) : 0;
+      const wScore = pts * (weightage || 0);
+
+      pointsDiv.textContent = pts.toString();
+      weightDiv.textContent = wScore.toFixed(2);
+
+      recalcTotals();
+    }
+
+    function recalcTotals() {
+      let totalWeighted = 0;
+      let maxWeighted = 0;
+
+      criteriaSections.forEach(section => {
+        section.Items.forEach(item => {
+          const sel = document.getElementById(`criteria_${item.CriteriaID}`);
+          const weightDiv = document.getElementById(`weight_${item.CriteriaID}`);
+          const optMax = item.Options.reduce((m, o) => Math.max(m, o.OptionPoints), 0);
+          maxWeighted += optMax * (item.Weightage || 0);
+
+          const wScore = weightDiv ? Number(weightDiv.textContent || '0') : 0;
+          totalWeighted += wScore;
+        });
+      });
+
+      const finalScore = maxWeighted > 0 ? totalWeighted / maxWeighted : 0;
+      const compliancePercent = finalScore * 100;
+
+      document.getElementById('finalScoreText').textContent = finalScore.toFixed(2);
+      document.getElementById('compliancePercentText').textContent = `${compliancePercent.toFixed(0)}%`;
+
+      let grade = '-';
+      gradeBands.forEach(g => {
+        if (compliancePercent >= g.CompliancePercentFrom && compliancePercent <= g.CompliancePercentTo) {
+          grade = g.GradeName;
+        }
+      });
+      document.getElementById('gradeText').textContent = grade;
+    }
+
+    function submitAudit() {
+      const status = document.getElementById('submitStatus');
+      status.textContent = 'Submitting...';
+
+      if (!currentUser) {
+        status.textContent = 'Login required.';
+        return;
+      }
+
+      const dspSel = document.getElementById('dspSelect');
+      const idx = dspSel.value ? parseInt(dspSel.value, 10) : -1;
+      if (idx < 0 || idx >= filteredStores.length) {
+        status.textContent = 'Select a DSP first.';
+        return;
+      }
+      const store = filteredStores[idx];
+
+      const locStatus = document.getElementById('locationStatus');
+      const lat = locStatus.dataset.lat || '';
+      const lng = locStatus.dataset.lng || '';
+      const capturedAt = locStatus.dataset.capturedAt || '';
+
+      const payload = {
+        auditDate: document.getElementById('auditDateInput').value || '',
+        auditTime: document.getElementById('auditTimeInput').value || '',
+        employeeId: currentUser.EmployeeID || '',
+        employeeName: currentUser.EmployeeName || '',
+        role: currentUser.Role || '',
+        region: currentUser.Region || '',
+        branch: currentUser.Branch || '',
+        dspCode: store.DSPCode || '',
+        dspName: store.DSPName || '',
+        dealerName: store.DealerName || '',
+        ownerName: store.OwnerName || '',
+        ownerNumber: store.OwnerNumber || '',
+        city: store.City || '',
+        pincode: store.Pincode || '',
+        state: store.State || '',
+        isdDeployment: store.ISDDeployment || '',
+        asmName: store.ASMName || '',
+        capturedLatitude: lat,
+        capturedLongitude: lng,
+        locationCapturedAt: capturedAt,
+        shopfrontPhotoURL: document.getElementById('shopfrontPhotoUrlInput').value || '',
+        storePhoto1URL: document.getElementById('storePhoto1UrlInput').value || '',
+        storePhoto2URL: document.getElementById('storePhoto2UrlInput').value || '',
+        storePhoto3URL: document.getElementById('storePhoto3UrlInput').value || '',
+        finalScore: document.getElementById('finalScoreText').textContent || '',
+        compliancePercent: document.getElementById('compliancePercentText').textContent.replace('%','') || '',
+        grade: document.getElementById('gradeText').textContent || '',
+        overallRemarks: document.getElementById('overallRemarksInput').value || ''
+      };
+
+      // Add criteria selections (options & scores) into payload keys expected by submitAudit_
+      criteriaSections.forEach(section => {
+        section.Items.forEach(item => {
+          const sel = document.getElementById(`criteria_${item.CriteriaID}`);
+          const optId = sel ? sel.value : '';
+          const ptsDiv = document.getElementById(`points_${item.CriteriaID}`);
+          const wDiv = document.getElementById(`weight_${item.CriteriaID}`);
+          const pts = ptsDiv ? ptsDiv.textContent : '';
+          const wScore = wDiv ? wDiv.textContent : '';
+
+          // Simple naming: CriteriaID_Option / Points / WeightedScore
+          payload[`${item.ParameterName.replace(/\s+/g,'')}_Option`] = optId;
+          payload[`${item.ParameterName.replace(/\s+/g,'')}_Points`] = pts;
+          payload[`${item.ParameterName.replace(/\s+/g,'')}_WeightedScore`] = wScore;
+        });
+      });
+
+      callApi('SUBMITAUDIT', payload)
+        .then(resp => {
+          if (!resp.success) {
+            status.textContent = resp.message || 'Error submitting audit.';
+            return;
+          }
+          status.textContent = `Audit submitted. ID: ${resp.auditId}`;
+        })
+        .catch(err => {
+          console.error(err);
+          status.textContent = 'Error submitting audit.';
+        });
+    }
+  </script>
 </body>
 </html>
