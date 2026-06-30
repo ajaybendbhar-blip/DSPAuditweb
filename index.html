@@ -65,10 +65,20 @@ textarea{min-height:110px}
 <body>
 <div class="app">
 <section class="hero">
-<h2>Audit progress</h2>
-<p>Login, select store, capture evidence, complete parameters, and submit.</p>
-<div style="margin-top:12px;background:rgba(255,255,255,.16);border-radius:999px;height:10px;overflow:hidden"><div id="progressBar" style="height:100%;width:0;background:#fff;border-radius:999px"></div></div>
-<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px"><span id="progressText">0% complete</span><span id="answeredText">0 / 0 answered</span></div>
+  <h2>Audit progress</h2>
+  <p>Login, select store, capture evidence, complete parameters, and submit.</p>
+  <div style="margin-top:12px;background:rgba(255,255,255,.16);border-radius:999px;height:10px;overflow:hidden">
+    <div id="progressBar" style="height:100%;width:0;background:#fff;border-radius:999px"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px">
+    <span id="progressText">0% complete</span>
+    <span id="answeredText">0 / 0 answered</span>
+  </div>
+  <div id="userInfo" style="margin-top:10px;font-size:12px;display:none;">
+    <span id="userNameLabel"></span>
+    <span> • </span>
+    <span id="userRoleLabel"></span>
+  </div>
 </section>
 
 <section class="card" id="loginCard">
@@ -84,7 +94,10 @@ textarea{min-height:110px}
 </section>
 
 <section class="card hide" id="auditCard">
-<div class="head"><div><h3>Audit details</h3><p>All store fields auto-fill after selecting DSP.</p></div><span class="pill ok">Logged in</span></div>
+<div class="head">
+  <div><h3>Audit details</h3><p>All store fields auto-fill after selecting DSP.</p></div>
+  <span class="pill ok">Logged in</span>
+</div>
 <div class="body">
 <div class="grid">
 <div class="field c12"><label>Select DSP</label><select id="dspSelect"><option value="">Select mapped DSP</option></select></div>
@@ -121,7 +134,10 @@ textarea{min-height:110px}
 <div class="section-head"><div><h4>Activity Planned</h4><div class="photo-note">Add one or more planned activities.</div></div></div>
 <div class="body">
 <div id="activityPlanner"></div>
-<div class="btnrow" style="margin-top:12px"><button class="btn sec" id="addActivityBtn" type="button">Add Activity</button><button class="btn ghost" id="savePlanBtn" type="button">Save Activity Plan</button></div>
+<div class="btnrow" style="margin-top:12px">
+  <button class="btn sec" id="addActivityBtn" type="button">Add Activity</button>
+  <button class="btn ghost" id="savePlanBtn" type="button">Save Activity Plan</button>
+</div>
 <div id="planMsg" class="msg"></div>
 </div>
 </div>
@@ -155,7 +171,10 @@ textarea{min-height:110px}
 <div class="sbox"><div class="l">Grade</div><div class="v" id="gradeText">Pending</div></div>
 <div class="sbox"><div class="l">Answered</div><div class="v" id="answeredCount">0</div></div>
 </div>
-<div class="btnrow" style="margin-top:12px"><button class="btn pri" id="submitBtn" type="button">Submit Audit</button><button class="btn sec" id="resetBtn" type="button">Reset Form</button></div>
+<div class="btnrow" style="margin-top:12px">
+  <button class="btn pri" id="submitBtn" type="button">Submit Audit</button>
+  <button class="btn sec" id="resetBtn" type="button">Reset Form</button>
+</div>
 <div id="submitMsg" class="msg"></div>
 </div>
 </div>
@@ -163,12 +182,29 @@ textarea{min-height:110px}
 </div>
 
 <script>
-const API_BASE = 'https://script.google.com/macros/s/AKfycbx0X2rN-Hj-TAj-FD5XRXpjsYWBf-JBXeNf-krAeI-P060I6eaIWJqmeC_kHnHEBoYG2w/exec';
+const API_BASE = 'https://script.google.com/macros/s/AKfycbyF_W02InL51Gy_s2LWiFVA_LlMu_p9KTDsZG8_t7ykjdajTVRKqkmmM25TesPOE3zcOA/exec';
 const AUTO_PASSWORD='Daikin@123';
 const fallbackActivities=['Influencer','Corporate Tie-Ups','Society Activation'];
 const state={user:null,stores:[],criteria:[],grades:[],selectedStore:null,responses:{},activityRows:[],activityTypes:[],gps:{lat:'',lng:'',capturedAt:''},photoFiles:{}};
 const $=id=>document.getElementById(id);
-const E={loginCard:$('loginCard'),auditCard:$('auditCard'),employeeId:$('employeeId'),password:$('password'),loginBtn:$('loginBtn'),loginMsg:$('loginMsg'),dspSelect:$('dspSelect'),auditDate:$('auditDate'),auditTime:$('auditTime'),dspCode:$('dspCode'),dspName:$('dspName'),dealerName:$('dealerName'),ownerName:$('ownerName'),ownerNumber:$('ownerNumber'),city:$('city'),pincode:$('pincode'),state:$('state'),region:$('region'),branch:$('branch'),asmName:$('asmName'),isdDeployment:$('isdDeployment'),activityPlanner:$('activityPlanner'),addActivityBtn:$('addActivityBtn'),savePlanBtn:$('savePlanBtn'),planMsg:$('planMsg'),gpsBtn:$('gpsBtn'),gpsMsg:$('gpsMsg'),capturedLatitude:$('capturedLatitude'),capturedLongitude:$('capturedLongitude'),locationCapturedAt:$('locationCapturedAt'),criteriaContainer:$('criteriaContainer'),finalScore:$('finalScore'),compliancePercent:$('compliancePercent'),gradeText:$('gradeText'),answeredCount:$('answeredCount'),overallRemarks:$('overallRemarks'),submitBtn:$('submitBtn'),resetBtn:$('resetBtn'),submitMsg:$('submitMsg'),progressBar:$('progressBar'),progressText:$('progressText'),answeredText:$('answeredText'),dspPerf:$('dspPerf'),photoEvidence:$('photoEvidence'),photoMsg:$('photoMsg')};
+const E={
+  loginCard:$('loginCard'),auditCard:$('auditCard'),
+  employeeId:$('employeeId'),password:$('password'),loginBtn:$('loginBtn'),loginMsg:$('loginMsg'),
+  dspSelect:$('dspSelect'),auditDate:$('auditDate'),auditTime:$('auditTime'),
+  dspCode:$('dspCode'),dspName:$('dspName'),dealerName:$('dealerName'),ownerName:$('ownerName'),
+  ownerNumber:$('ownerNumber'),city:$('city'),pincode:$('pincode'),state:$('state'),
+  region:$('region'),branch:$('branch'),asmName:$('asmName'),isdDeployment:$('isdDeployment'),
+  activityPlanner:$('activityPlanner'),addActivityBtn:$('addActivityBtn'),savePlanBtn:$('savePlanBtn'),
+  planMsg:$('planMsg'),gpsBtn:$('gpsBtn'),gpsMsg:$('gpsMsg'),
+  capturedLatitude:$('capturedLatitude'),capturedLongitude:$('capturedLongitude'),locationCapturedAt:$('locationCapturedAt'),
+  criteriaContainer:$('criteriaContainer'),
+  finalScore:$('finalScore'),compliancePercent:$('compliancePercent'),gradeText:$('gradeText'),
+  answeredCount:$('answeredCount'),overallRemarks:$('overallRemarks'),
+  submitBtn:$('submitBtn'),resetBtn:$('resetBtn'),submitMsg:$('submitMsg'),
+  progressBar:$('progressBar'),progressText:$('progressText'),answeredText:$('answeredText'),
+  dspPerf:$('dspPerf'),photoEvidence:$('photoEvidence'),photoMsg:$('photoMsg'),
+  userInfo:$('userInfo'),userNameLabel:$('userNameLabel'),userRoleLabel:$('userRoleLabel')
+};
 const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 document.addEventListener('DOMContentLoaded',()=>{
@@ -192,7 +228,7 @@ function bind(){
   updateProgress();
 }
 
-function msg(el,text,type){el.className='msg '+type;el.textContent=text}
+function msg(el,text,type){el.className='msg '+type;el.textContent=text;}
 
 async function api(action,payload){
   const res=await fetch(API_BASE+'?action='+encodeURIComponent(action),{
@@ -212,7 +248,7 @@ function fileToBase64(file){
   });
 }
 
-function stripPrefix_(s){return String(s||'').split(',').pop()}
+function stripPrefix_(s){return String(s||'').split(',').pop();}
 
 async function compressFile(file,maxW=1280,quality=0.72){
   const dataUrl=await fileToBase64(file);
@@ -232,20 +268,6 @@ async function compressFile(file,maxW=1280,quality=0.72){
   return out;
 }
 
-async function uploadPhotoByInput(inputEl,slotId){
-  const file=inputEl.files&&inputEl.files[0];
-  if(!file)throw new Error('Select a photo first');
-  msg(E.photoMsg,'Uploading '+slotId+' ...','ok');
-  const compressed=await compressFile(file);
-  const r=await api('UPLOADIMAGE',{
-    base64Data:stripPrefix_(compressed),
-    fileName:slotId+'_'+Date.now()+'.jpg',
-    mimeType:'image/jpeg'
-  });
-  if(!r.success)throw new Error(r.message||'Image upload failed');
-  return r.fileUrl;
-}
-
 function esc(s){
   return String(s==null?'':s).replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
 }
@@ -263,6 +285,14 @@ async function login(){
     state.criteria=d.criteria||[];
     state.grades=d.grades||[];
     state.activityTypes=(d.activityTypes&&d.activityTypes.length)?d.activityTypes:fallbackActivities;
+
+    // Show user name + role in hero
+    if(state.user){
+      E.userNameLabel.textContent = state.user.EmployeeName || '';
+      E.userRoleLabel.textContent = state.user.Role || '';
+      E.userInfo.style.display = 'block';
+    }
+
     E.loginCard.classList.add('hide');
     E.auditCard.classList.remove('hide');
     renderStores();
